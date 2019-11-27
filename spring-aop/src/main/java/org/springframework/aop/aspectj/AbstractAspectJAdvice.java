@@ -560,7 +560,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	 */
 	protected Object[] argBinding(JoinPoint jp, @Nullable JoinPointMatch jpMatch,
 			@Nullable Object returnValue, @Nullable Throwable ex) {
-
+		//填充必要的属性
 		calculateArgumentBindings();
 
 		// AMC start
@@ -629,7 +629,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	// As above, but in this case we are given the join point.
 	protected Object invokeAdviceMethod(JoinPoint jp, @Nullable JoinPointMatch jpMatch,
 			@Nullable Object returnValue, @Nullable Throwable t) throws Throwable {
-
+		//argBinding()用来填充方法参数。就是@Around作用的方法上的ProceedingJoinPoint参数
 		return invokeAdviceMethodWithGivenArgs(argBinding(jp, jpMatch, returnValue, t));
 	}
 
@@ -640,7 +640,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 		}
 		try {
 			ReflectionUtils.makeAccessible(this.aspectJAdviceMethod);
-			// TODO AopUtils.invokeJoinpointUsingReflection
+			// TODO AopUtils.invokeJoinpointUsingReflection  反射调用通知方法
 			return this.aspectJAdviceMethod.invoke(this.aspectInstanceFactory.getAspectInstance(), actualArgs);
 		}
 		catch (IllegalArgumentException ex) {

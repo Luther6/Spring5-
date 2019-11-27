@@ -351,7 +351,10 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 
 		do {
-			// 对我们的(配置类)进行解析,重点中的重点
+			// 对我们的(配置类)进行解析,重点中的重点,
+			/**
+			 * 这个方法调用ConfigurationClassParser 的parse已经把我们所注册的bd找到了(比如:@Import ,扫描出来的,@Bean注册的,ImportSource的)
+			 */
 			parser.parse(candidates);
 			//主要是对当前配置类做一些校验,具体的校验之后看把
 			parser.validate();
@@ -373,7 +376,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 						this.importBeanNameGenerator, parser.getImportRegistry());
 			}
 			/**
-			 * 这里就是涉及注册我们刚刚缓存的类比如:@Bean  Import的普通类,很重要
+			 * 这里就是涉及注册我们刚刚缓存的类比如:@Bean  Import的普通类,和我们的ImportBeanDefinitionRegistra 类型的很重要。
 			 */
 			this.reader.loadBeanDefinitions(configClasses);
 			//添加已经注册的类
@@ -473,6 +476,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 							logger.trace(String.format("Replacing bean definition '%s' existing class '%s' with " +
 									"enhanced class '%s'", entry.getKey(), configClass.getName(), enhancedClass.getName()));
 						}
+						// 在这里进行了偷梁换柱,把我们生成的代理类的Class对象放到了里面
 						beanDef.setBeanClass(enhancedClass);
 					}
 				}

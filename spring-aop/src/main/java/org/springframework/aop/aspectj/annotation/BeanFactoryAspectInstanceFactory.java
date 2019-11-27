@@ -87,6 +87,7 @@ public class BeanFactoryAspectInstanceFactory implements MetadataAwareAspectInst
 
 	@Override
 	public Object getAspectInstance() {
+		// 从工厂中获取bean
 		return this.beanFactory.getBean(this.name);
 	}
 
@@ -106,6 +107,7 @@ public class BeanFactoryAspectInstanceFactory implements MetadataAwareAspectInst
 	@Override
 	@Nullable
 	public Object getAspectCreationMutex() {
+		//根据此前的beanName是否是单例的来进行判断是否需要加上一把锁
 		if (this.beanFactory.isSingleton(this.name)) {
 			// Rely on singleton semantics provided by the factory -> no local lock.
 			return null;

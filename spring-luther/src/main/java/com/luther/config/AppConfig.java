@@ -23,5 +23,6 @@ import org.springframework.stereotype.Component;
 @Configuration
 @ComponentScan(basePackages = {"com.luther"})
 @Import({ImportSelectorBean.class,ImportBDRegistryBean.class})
+@EnableAspectJAutoProxy
 public class AppConfig{
 }

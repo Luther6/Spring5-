@@ -15,4 +15,7 @@ dependencies {
     compile (project(":spring-context"))
     compile(project(":spring-instrument"))
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    // https://mvnrepository.com/artifact/org.aspectj/aspectjweaver
+    compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.4'
+
 }

@@ -53,6 +53,8 @@ public abstract class AopConfigUtils {
 
 	/**
 	 * Stores the auto proxy creator classes in escalation order.
+	 *
+	 * 按照顺序来建立排名表,
 	 */
 	private static final List<Class<?>> APC_PRIORITY_LIST = new ArrayList<>(3);
 
@@ -119,19 +121,23 @@ public abstract class AopConfigUtils {
 			Class<?> cls, BeanDefinitionRegistry registry, @Nullable Object source) {
 
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
-
+		/**
+		 * 判断当前的org.springframework.aop.config.internalAutoProxyCreator的beanName是否被使用
+		 * 就是判断当前容器中是否有了完成AOP的bean,然后根据排名来决定采用哪一个
+		 */
 		if (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) {
 			BeanDefinition apcDefinition = registry.getBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME);
 			if (!cls.getName().equals(apcDefinition.getBeanClassName())) {
 				int currentPriority = findPriorityForClass(apcDefinition.getBeanClassName());
 				int requiredPriority = findPriorityForClass(cls);
+				//使用排名高的后置处理器,AnnotationAwareAspectJAutoProxyCreator在List中index = 3最高。index 越大 排名越高
 				if (currentPriority < requiredPriority) {
 					apcDefinition.setBeanClassName(cls.getName());
 				}
 			}
 			return null;
 		}
-
+		//如果容器中不存在的话,那么就按照传递过来的Class对象创建bd,使用的是RootBeanDefinition表明是Spring内部的类
 		RootBeanDefinition beanDefinition = new RootBeanDefinition(cls);
 		beanDefinition.setSource(source);
 		beanDefinition.getPropertyValues().add("order", Ordered.HIGHEST_PRECEDENCE);

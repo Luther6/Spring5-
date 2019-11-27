@@ -76,6 +76,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 				new InstanceComparator<>(
 						Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class),
 				(Converter<Method, Annotation>) method -> {
+					//java8 语法 获取到特定的注解对象 findAspectJAnnotationOnMethod() 基于方法来寻找。在这里需要注意一个点:就是pointcut.class已经被排除了
 					AspectJAnnotation<?> annotation =
 						AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(method);
 					return (annotation != null ? annotation.getAnnotation() : null);
@@ -112,17 +113,28 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 
 	@Override
 	public List<Advisor> getAdvisors(MetadataAwareAspectInstanceFactory aspectInstanceFactory) {
+		//获取到  原生的 Aspect Class对象
 		Class<?> aspectClass = aspectInstanceFactory.getAspectMetadata().getAspectClass();
+		// 获取aspectName
 		String aspectName = aspectInstanceFactory.getAspectMetadata().getAspectName();
+		//对Class 对象再次校验 :校验父类类型和当前类类型与Scope是否符合
 		validate(aspectClass);
 
 		// We need to wrap the MetadataAwareAspectInstanceFactory with a decorator
 		// so that it will only instantiate once.
+		//装饰实现单例:对Aspect.class进行单例控制
 		MetadataAwareAspectInstanceFactory lazySingletonAspectInstanceFactory =
 				new LazySingletonAspectInstanceFactoryDecorator(aspectInstanceFactory);
 
 		List<Advisor> advisors = new ArrayList<>();
+		/**
+		 * getAdvisorMethods()排除所有的添加了 @PointCut的方法
+		 * 然后根据Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class 未添加进行排序
+		 * 如果相同的话那么就根据方法名称来进行排序。
+		 * 还需要注意这里面的排序时会对方法上的注解进行缓存到findAnnotationCache中去。需要详细分析
+		 */
 		for (Method method : getAdvisorMethods(aspectClass)) {
+			//获取advisor实现类
 			Advisor advisor = getAdvisor(method, lazySingletonAspectInstanceFactory, advisors.size(), aspectName);
 			if (advisor != null) {
 				advisors.add(advisor);
@@ -130,12 +142,13 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		}
 
 		// If it's a per target aspect, emit the dummy instantiating aspect.
+		//如果通知不为空,且该切面类是延迟加载的。不懂先不看。并不是延迟加载的
 		if (!advisors.isEmpty() && lazySingletonAspectInstanceFactory.getAspectMetadata().isLazilyInstantiated()) {
 			Advisor instantiationAdvisor = new SyntheticInstantiationAdvisor(lazySingletonAspectInstanceFactory);
 			advisors.add(0, instantiationAdvisor);
 		}
 
-		// Find introduction fields.
+		// Find introduction fields. 查询当前切面类是否有Advisor的成员变量。并添加
 		for (Field field : aspectClass.getDeclaredFields()) {
 			Advisor advisor = getDeclareParentsAdvisor(field);
 			if (advisor != null) {
@@ -154,6 +167,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 				methods.add(method);
 			}
 		});
+		//进行排序 METHOD_COMPARATOR注意
 		methods.sort(METHOD_COMPARATOR);
 		return methods;
 	}
@@ -186,31 +200,39 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	@Nullable
 	public Advisor getAdvisor(Method candidateAdviceMethod, MetadataAwareAspectInstanceFactory aspectInstanceFactory,
 			int declarationOrderInAspect, String aspectName) {
-
+		/**
+		 * 对于传递过来的Aspect进行校验
+		 */
 		validate(aspectInstanceFactory.getAspectMetadata().getAspectClass());
-
+		/**
+		 * 根据Aspect.class来生成AspectJExpressionPointCut,该类实现了 PointCut等接口。来缓存切点表达式等信息
+		 */
 		AspectJExpressionPointcut expressionPointcut = getPointcut(
 				candidateAdviceMethod, aspectInstanceFactory.getAspectMetadata().getAspectClass());
 		if (expressionPointcut == null) {
 			return null;
 		}
-
+		//创建 Advisor 实现类 并返回。该类包括了切点表达式,所属类,通知方法,通知参数。也就是说通过这个类记录需要完成AOP的对应信息
 		return new InstantiationModelAwarePointcutAdvisorImpl(expressionPointcut, candidateAdviceMethod,
 				this, aspectInstanceFactory, declarationOrderInAspect, aspectName);
 	}
 
 	@Nullable
 	private AspectJExpressionPointcut getPointcut(Method candidateAdviceMethod, Class<?> candidateAspectClass) {
+		//这里仍然和我们的之前对方法进行排序时进行查找注解对象的操作(因为这里在findAnnotationCache中做过缓存了。至于为什么要再查询一遍。不知道为什么...)
 		AspectJAnnotation<?> aspectJAnnotation =
 				AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(candidateAdviceMethod);
 		if (aspectJAnnotation == null) {
 			return null;
 		}
-
+		// 这里用来生成切点表达式一个解析工具: 需要注意的是  每一个advisor 都对应着这么一个切点表达式工具。然后每一个这个切点表达式公式都是对应着一个Aspect类
+		// 但是要记住 这里只是把最原始的信息放到了里面并没有对切点表达式进行任何解析
 		AspectJExpressionPointcut ajexp =
 				new AspectJExpressionPointcut(candidateAspectClass, new String[0], new Class<?>[0]);
+		// 缓存我们之前解析注解时拿取到的值(pointCut())
 		ajexp.setExpression(aspectJAnnotation.getPointcutExpression());
 		if (this.beanFactory != null) {
+			// 设置工厂
 			ajexp.setBeanFactory(this.beanFactory);
 		}
 		return ajexp;
@@ -244,7 +266,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		}
 
 		AbstractAspectJAdvice springAdvice;
-
+		//实例化对应的advice实现类。AspectJMethodBeforeAdvice这个类
 		switch (aspectJAnnotation.getAnnotationType()) {
 			case AtPointcut:
 				if (logger.isDebugEnabled()) {
@@ -256,6 +278,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 						candidateAdviceMethod, expressionPointcut, aspectInstanceFactory);
 				break;
 			case AtBefore:
+				//todo，在这里根据注解类型实例化一个具体的通知列
 				springAdvice = new AspectJMethodBeforeAdvice(
 						candidateAdviceMethod, expressionPointcut, aspectInstanceFactory);
 				break;
@@ -280,17 +303,22 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 				}
 				break;
 			default:
+				//默认将会抛出异常
 				throw new UnsupportedOperationException(
 						"Unsupported advice type on method: " + candidateAdviceMethod);
 		}
 
-		// Now to configure the advice...
+		// Now to configure the advice... 设置该注解所属的类的beanName
 		springAdvice.setAspectName(aspectName);
 		springAdvice.setDeclarationOrder(declarationOrder);
+		//获取被通知类注解作用的方法的参数,就是@Before作用的调用函数
 		String[] argNames = this.parameterNameDiscoverer.getParameterNames(candidateAdviceMethod);
 		if (argNames != null) {
+			//缓存
 			springAdvice.setArgumentNamesFromStringArray(argNames);
 		}
+		//假如当前注解方法有参数的话。那么在真正进行调用之前,在这里会尽可能多的设置可以被设置的参数。
+		//如pointcut 类型的数据(切点的表达式解析)
 		springAdvice.calculateArgumentBindings();
 
 		return springAdvice;

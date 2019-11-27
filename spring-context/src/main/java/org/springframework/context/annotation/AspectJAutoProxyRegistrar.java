@@ -22,6 +22,8 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 
 /**
+ * ImportBeanDefinitionRegistrar:用来注册bd。
+ *
  * Registers an {@link org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator
  * AnnotationAwareAspectJAutoProxyCreator} against the current {@link BeanDefinitionRegistry}
  * as appropriate based on a given @{@link EnableAspectJAutoProxy} annotation.
@@ -31,6 +33,7 @@ import org.springframework.core.type.AnnotationMetadata;
  * @since 3.1
  * @see EnableAspectJAutoProxy
  */
+
 class AspectJAutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 
 	/**
@@ -42,11 +45,14 @@ class AspectJAutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 	public void registerBeanDefinitions(
 			AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
 
+		//注册Aop必要的后置处理器---->AnnotationAwareAspectJAutoProxyCreator
 		AopConfigUtils.registerAspectJAnnotationAutoProxyCreatorIfNecessary(registry);
-
+		//获取到EnableAspectJAutoProxy这个注解的proxyTargetClass,在下面判断默认使用的是JDK动态代理还是CGLib动态代理。
+		//exposeProxy 是否将代理对象暴露出来(之后看把)
 		AnnotationAttributes enableAspectJAutoProxy =
 				AnnotationConfigUtils.attributesFor(importingClassMetadata, EnableAspectJAutoProxy.class);
 		if (enableAspectJAutoProxy != null) {
+			// 如果为true的话,那么为bd添加属性proxyTargetClass为true.默认是没有proxyTargetClass的属性的。下面也一样
 			if (enableAspectJAutoProxy.getBoolean("proxyTargetClass")) {
 				AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);
 			}
@@ -54,6 +60,9 @@ class AspectJAutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 				AopConfigUtils.forceAutoProxyCreatorToExposeProxy(registry);
 			}
 		}
+		/**
+		 * 这个处理器在refresh()的registerBeanPostProcessors(beanFactory);方法中被实例化。之前没怎么看。。。
+		 */
 	}
 
 }

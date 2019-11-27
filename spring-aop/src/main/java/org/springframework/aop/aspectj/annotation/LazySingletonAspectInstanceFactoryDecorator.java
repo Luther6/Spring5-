@@ -51,12 +51,14 @@ public class LazySingletonAspectInstanceFactoryDecorator implements MetadataAwar
 	public Object getAspectInstance() {
 		Object aspectInstance = this.materialized;
 		if (aspectInstance == null) {
+			//创建锁如果工厂中bean本身为null的话,那么就weinull
 			Object mutex = this.maaif.getAspectCreationMutex();
 			if (mutex == null) {
 				aspectInstance = this.maaif.getAspectInstance();
 				this.materialized = aspectInstance;
 			}
 			else {
+				//不然在这里加锁处理
 				synchronized (mutex) {
 					aspectInstance = this.materialized;
 					if (aspectInstance == null) {

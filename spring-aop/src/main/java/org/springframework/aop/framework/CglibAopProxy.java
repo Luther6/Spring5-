@@ -155,6 +155,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 		return getProxy(null);
 	}
 
+	//CGLib代理
 	@Override
 	public Object getProxy(@Nullable ClassLoader classLoader) {
 		if (logger.isTraceEnabled()) {
@@ -162,9 +163,12 @@ class CglibAopProxy implements AopProxy, Serializable {
 		}
 
 		try {
+			//获取到要代理的Class对象
 			Class<?> rootClass = this.advised.getTargetClass();
 			Assert.state(rootClass != null, "Target class must be available for creating a CGLIB proxy");
-
+			/**
+			 * 获取其父类实现了接口,因为需要继承其父类的接口方法
+			 */
 			Class<?> proxySuperClass = rootClass;
 			if (ClassUtils.isCglibProxyClass(rootClass)) {
 				proxySuperClass = rootClass.getSuperclass();
@@ -174,23 +178,28 @@ class CglibAopProxy implements AopProxy, Serializable {
 				}
 			}
 
-			// Validate the class, writing log messages as necessary.
+			// Validate the class, writing log messages as necessary.校验
 			validateClassIfNecessary(proxySuperClass, classLoader);
 
-			// Configure CGLIB Enhancer...
+			// Configure CGLIB Enhancer...  生成Enhancer进行代理.并不是原生的Enhancer 而是Spring自定义的Enhancer
 			Enhancer enhancer = createEnhancer();
 			if (classLoader != null) {
+				// 设置类加载器
 				enhancer.setClassLoader(classLoader);
 				if (classLoader instanceof SmartClassLoader &&
 						((SmartClassLoader) classLoader).isClassReloadable(proxySuperClass)) {
 					enhancer.setUseCache(false);
 				}
 			}
+			//设置增强父类
 			enhancer.setSuperclass(proxySuperClass);
+			//设置增强接口
 			enhancer.setInterfaces(AopProxyUtils.completeProxiedInterfaces(this.advised));
+			//设置命名规则
 			enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
+			//设置生成策略
 			enhancer.setStrategy(new ClassLoaderAwareUndeclaredThrowableStrategy(classLoader));
-
+			//设置callBack对象就是我们之前定义的一些advisor  之后分析了
 			Callback[] callbacks = getCallbacks(rootClass);
 			Class<?>[] types = new Class<?>[callbacks.length];
 			for (int x = 0; x < types.length; x++) {
@@ -201,7 +210,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 					this.advised.getConfigurationOnlyCopy(), this.fixedInterceptorMap, this.fixedInterceptorOffset));
 			enhancer.setCallbackTypes(types);
 
-			// Generate the proxy class and create a proxy instance.
+			// Generate the proxy class and create a proxy instance. 创建动态代理  之后详细看一下这边的CgLib代理生成的规则
 			return createProxyClassAndInstance(enhancer, callbacks);
 		}
 		catch (CodeGenerationException | IllegalArgumentException ex) {

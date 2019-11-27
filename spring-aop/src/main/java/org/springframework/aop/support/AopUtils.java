@@ -222,10 +222,13 @@ public abstract class AopUtils {
 	 */
 	public static boolean canApply(Pointcut pc, Class<?> targetClass, boolean hasIntroductions) {
 		Assert.notNull(pc, "Pointcut must not be null");
+		//首先通过类级别进行判断,在这里重点注意getClassFilter():
+		// 在这里面完成了对@Aspect 类的 pointCut()的解析。(之前我们存取到这个PointCut中的只是value="pointCut()") 并未完成解析到具体的内容
+		//也可以理解未我们并未对@PonitCut进行任何的解析。因为之前过滤掉了这个注解方法的解析
 		if (!pc.getClassFilter().matches(targetClass)) {
 			return false;
 		}
-
+		//这里的methodMatcher和我们刚刚拿取的getClassFilter()其实是一样。因为之前做过解析了这里就不会再做解析了
 		MethodMatcher methodMatcher = pc.getMethodMatcher();
 		if (methodMatcher == MethodMatcher.TRUE) {
 			// No need to iterate the methods if we're matching any method anyway...
@@ -238,13 +241,25 @@ public abstract class AopUtils {
 		}
 
 		Set<Class<?>> classes = new LinkedHashSet<>();
+		//判断当前的类是否是代理类如果是代理的类的话，需要拿到原是的类
 		if (!Proxy.isProxyClass(targetClass)) {
 			classes.add(ClassUtils.getUserClass(targetClass));
 		}
+		/**
+		 * 获取当前类和其父类(在一个命名空间中,一个类加载器加载)所实现的接口的Class对象。
+		 * 为什么要这样获取呢。因为我们可以继承到父类以及祖先类中实现的接口的方法(接口方法 默认是 public的)
+		 */
 		classes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
 
 		for (Class<?> clazz : classes) {
+			//获取该类的所有的方法
 			Method[] methods = ReflectionUtils.getAllDeclaredMethods(clazz);
+			// 使用 methodMatcher 匹配方法，匹配成功即可立即返回
+			/**
+			 * 该类型切点实现了ClassFilter 和 MethodMatcher 接口，匹配的工作则是由 AspectJ 表达式解析器负责。除了使用 AspectJ 表达式进行匹配，
+			 * Spring 还提供了基于正则表达式的切点类，以及更简单的根据方法名进行匹配的切点类。
+			 * 这里的关于AspectJ的代码没搞懂只会看把
+			 */
 			for (Method method : methods) {
 				if (introductionAwareMethodMatcher != null ?
 						introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions) :
@@ -280,11 +295,14 @@ public abstract class AopUtils {
 	 * @return whether the pointcut can apply on any method
 	 */
 	public static boolean canApply(Advisor advisor, Class<?> targetClass, boolean hasIntroductions) {
+		//如果当前Advisor是 引介类型的话。则可以使用ClassFilter来进行过来操作(最小粒度为类)(之后看了)
 		if (advisor instanceof IntroductionAdvisor) {
 			return ((IntroductionAdvisor) advisor).getClassFilter().matches(targetClass);
 		}
 		else if (advisor instanceof PointcutAdvisor) {
+
 			PointcutAdvisor pca = (PointcutAdvisor) advisor;
+			//如果是PointCutAdvisor 也就是普通Advisor,那么不仅有ClassFilter ,还有MethodFilter
 			return canApply(pca.getPointcut(), targetClass, hasIntroductions);
 		}
 		else {
@@ -307,16 +325,24 @@ public abstract class AopUtils {
 		}
 		List<Advisor> eligibleAdvisors = new ArrayList<>();
 		for (Advisor candidate : candidateAdvisors) {
+
+			/**
+			 * 筛选 IntroductionAdvisor 类型的通知器 也就是引介类型的切面。
+			 * 当前介绍一下。之后详细分析这种面向类的切面。它的最小粒度只能是类而不是PointCut类型可以对方法级别进行拦截
+			 * 它的使用需要进行接口的扩展来实现了对方法的所有的方法的拦截(之后详细看了)目前并未使用这样的
+			 */
 			if (candidate instanceof IntroductionAdvisor && canApply(candidate, clazz)) {
 				eligibleAdvisors.add(candidate);
 			}
 		}
 		boolean hasIntroductions = !eligibleAdvisors.isEmpty();
 		for (Advisor candidate : candidateAdvisors) {
+			// 筛选普通Advisor 类型的通知器
 			if (candidate instanceof IntroductionAdvisor) {
 				// already processed
 				continue;
 			}
+			//canApply判断当前顾问是否可以被使用,并添加集合中并返回
 			if (canApply(candidate, clazz, hasIntroductions)) {
 				eligibleAdvisors.add(candidate);
 			}
@@ -339,6 +365,7 @@ public abstract class AopUtils {
 
 		// Use reflection to invoke the method.
 		try {
+			//反射调用很简单
 			ReflectionUtils.makeAccessible(method);
 			return method.invoke(target, args);
 		}

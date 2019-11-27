@@ -52,7 +52,11 @@ public class AfterReturningAdviceInterceptor implements MethodInterceptor, After
 
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
+		/**
+		 * 同样会返回方法。Spring在这里解决的方法类似递归的实现。简单高效！
+		 */
 		Object retVal = mi.proceed();
+		//如果正常执行将会调用具体的after()的逻辑
 		this.advice.afterReturning(retVal, mi.getMethod(), mi.getArguments(), mi.getThis());
 		return retVal;
 	}

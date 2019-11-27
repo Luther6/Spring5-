@@ -16,7 +16,7 @@ import javax.annotation.Resource;
  */
 @Component
 public class UserDao {
-	@Autowired
+	@Autowired(required = false)
 	public UserDao1 userDao1A;
 
 	/*@Autowired(required = false)

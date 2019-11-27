@@ -512,6 +512,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 *	不理解是干什么的。之后看。这里是我们的后置处理器。但是这里我们的Bean还没有实例化,出来这个是干什么的呢?
 			 * 	如果返回一个Bean那么就不会去进行下面的操作(比如属性的依赖赋值。。)也可以说这里将会返回一个寡对象。就是它的
 			 * 	一些依赖都为空。需要实现InstantiationAwareBeanPostProcessor 接口 {@link com.luther.beanpostprocessor.InstantiationAwareBP}
+			 *
+			 *
+			 *
+			 * 	这里涉及AOP的后置处理器-->AnnotationAwareAspectJAutoProxyCreator#postProcessorBeforeInstantiation。在这里进行防护主要是用来对AOP基础建设类进行拦截
+			 *
 			 */
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
@@ -593,7 +598,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					 * 	CommonAnnotationBeanPostProcessor:
 					 * 		主要是来处理init-method与destory-method。并把方法给缓存起来
 					 * 	AutowiredAnnotationBeanPostProcessor：
-					 * 		主要是来处理@Autowired与@Value且required = true的字段与方法对象,并缓存起来.
+					 * 		主要是来处理@Autowired与@Value的字段与方法对象,并缓存起来.
 					 * @Value 就是用来进行我们获取到我们之前添加Spring容器 中的properties文件中的值
 					 * 	ApplicationListenerDetector:
 					 * 		为该Bean是否是单例的做缓存
@@ -628,12 +633,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Initialize the bean instance.
 		Object exposedObject = bean;
 		try {
-			//这里就特别重要了。用来处理进行我们的属性的注入
+			//这里就特别重要了。用来处理进行我们的属性的注入。
 			populateBean(beanName, mbd, instanceWrapper);
 			/**
 			 * 这里也很重要了,只要是来执行我们相关的后置处理器.
+			 * 到这里你可以认为一个普通的Bean已经被完全的实例化好了,不普通的Bean就是到现在还需要做一些改变的bean。比如我们的AOP涉及的bean
+			 * 与我们实现了如ApplicationContextAware和BeanFactoryAware 需要再次注入属性的类
 			 *
-			 * AOP也是在这里完成了。这个到Mybatis说
 			 */
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
 		}
@@ -1515,7 +1521,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 * 2、不管你这边传入的是否是正确的beanName Spring都会根据你的承成员变量的类型来查到到对应的beanName。然后根据这个beanName来从
 			 * 	  Spring容器中去查找到你需要的bean。其中涉及到缓存的也将使用的是查询到的beanName进行缓存。(具体缓存没看之后看)
 			 * 3、还要记住Spring的注入不仅可以注入一个变量也可以注入比如Array,Map,List这类集合类型。(具体注入之后看)
-			 *
+			 * 4、  关于@Resource与@Autowired的区别之后看
 			 * 其次方法注入:
 			 * 1、变量的查找也是和成员变量的查找一样,但是要注意一点,就是这个方法在属性查找完之后就会被调用
 			 *
@@ -1883,6 +1889,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		else {
 			//处理一些后置处理器,对于实现了Aware这些处理器用来设置一些变量如:BeanFactory,BeanClassLoader等(Spring的处理器太多了..慢慢玩把)
+			/**
+			 * AOP来了。AOP注入了AnnotationAwareAspectJAutoProxyCreator是实现了BeanFactoryAware
+			 */
 			invokeAwareMethods(beanName, bean);
 		}
 
@@ -1910,6 +1919,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		/**
 		 * 用来处理postProcessAfterInitialization方法比较少
+		 * 在这一步最重要的一个BeanPostProcessor就是我们用来处理AOP的AnnotationAwareAspectJAutoProxyCreator.class
 		 */
 		if (mbd == null || !mbd.isSynthetic()) {
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);

@@ -61,10 +61,12 @@ public class AspectJAroundAdvice extends AbstractAspectJAdvice implements Method
 
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
+		//Around
 		if (!(mi instanceof ProxyMethodInvocation)) {
 			throw new IllegalStateException("MethodInvocation is not a Spring ProxyMethodInvocation: " + mi);
 		}
 		ProxyMethodInvocation pmi = (ProxyMethodInvocation) mi;
+		//获取连接点。在方法中通过它来实现around
 		ProceedingJoinPoint pjp = lazyGetProceedingJoinPoint(pmi);
 		JoinPointMatch jpm = getJoinPointMatch(pmi);
 		return invokeAdviceMethod(pjp, jpm, null, null);

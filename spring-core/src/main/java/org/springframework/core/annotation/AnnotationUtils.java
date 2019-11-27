@@ -458,6 +458,7 @@ public abstract class AnnotationUtils {
 
 		// Do NOT store result in the findAnnotationCache since doing so could break
 		// findAnnotation(Class, Class) and findAnnotation(Method, Class).
+
 		A ann = findAnnotation(annotatedElement, annotationType, new HashSet<>());
 		return (ann != null ? synthesizeAnnotation(ann, annotatedElement) : null);
 	}
@@ -476,10 +477,12 @@ public abstract class AnnotationUtils {
 	private static <A extends Annotation> A findAnnotation(
 			AnnotatedElement annotatedElement, Class<A> annotationType, Set<Annotation> visited) {
 		try {
+			//根据指定类型来获取注解类型
 			A annotation = annotatedElement.getDeclaredAnnotation(annotationType);
 			if (annotation != null) {
 				return annotation;
 			}
+			//用来获取注解上运用的注解,就相当于元注解
 			for (Annotation declaredAnn : getDeclaredAnnotations(annotatedElement)) {
 				Class<? extends Annotation> declaredType = declaredAnn.annotationType();
 				if (!isInJavaLangAnnotationPackage(declaredType) && visited.add(declaredAnn)) {
@@ -518,17 +521,22 @@ public abstract class AnnotationUtils {
 		if (annotationType == null) {
 			return null;
 		}
-
+		//根据方法对象与Class类型生成cacheKey
 		AnnotationCacheKey cacheKey = new AnnotationCacheKey(method, annotationType);
+		//findAnnotationCache 目前为只有 Aspect
 		A result = (A) findAnnotationCache.get(cacheKey);
 
 		if (result == null) {
+			//获取原始方法对象
 			Method resolvedMethod = BridgeMethodResolver.findBridgedMethod(method);
+			//根据原始方法对象来得到通知注解
 			result = findAnnotation((AnnotatedElement) resolvedMethod, annotationType);
 			if (result == null) {
+				//如果实现了接口,那么到该接口的该方法中寻找是否有合适的注解.
 				result = searchOnInterfaces(method, annotationType, method.getDeclaringClass().getInterfaces());
 			}
 
+			//到该类的父类中进行注解查找先不看了
 			Class<?> clazz = method.getDeclaringClass();
 			while (result == null) {
 				clazz = clazz.getSuperclass();
@@ -553,7 +561,9 @@ public abstract class AnnotationUtils {
 			}
 
 			if (result != null) {
+				//再进行一次校验，防止出错把
 				result = synthesizeAnnotation(result, method);
+				//缓存到 findAnnotationCache中
 				findAnnotationCache.put(cacheKey, result);
 			}
 		}
@@ -1559,7 +1569,9 @@ public abstract class AnnotationUtils {
 		}
 
 		Class<? extends Annotation> annotationType = annotation.annotationType();
+		//判断是否时可以被合成的。就是判断该注解是否有返回值是注解类型,这样会在下面动态生成一个可合成的注解
 		if (!isSynthesizable(annotationType)) {
+			// 一般返回原注解类型,目前并没有这样的注解。之后看
 			return annotation;
 		}
 

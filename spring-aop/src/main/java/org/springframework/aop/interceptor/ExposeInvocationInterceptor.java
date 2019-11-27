@@ -87,9 +87,12 @@ public final class ExposeInvocationInterceptor implements MethodInterceptor, Pri
 
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
+		//invocation 是一个ThreadLocal。它主要是来进行缓存。在下面会把方法调度器进行缓存。主要是用来对Spring 进行AOP代理时,预防线程冲突问题
+		//具体是什么。现在还不太懂之后看
 		MethodInvocation oldInvocation = invocation.get();
 		invocation.set(mi);
 		try {
+			// 调用方法调度器的方法  ReflectiveMethodInvocation。还是回到了我们刚刚的方法。
 			return mi.proceed();
 		}
 		finally {

@@ -261,9 +261,13 @@ final class PostProcessorRegistrationDelegate {
 		List<BeanPostProcessor> internalPostProcessors = new ArrayList<>();
 		List<String> orderedPostProcessorNames = new ArrayList<>();
 		List<String> nonOrderedPostProcessorNames = new ArrayList<>();
-		//处理我们在刚刚开始注入了,或者扫描到bdMap中的BeanPostProcessor，主要是通过一些优先级来进行注册。实现了PriorityProcessor接口的类
+		//处理我们在刚刚开始注入了,或者扫描到bdMap中的BeanPostProcessor，主要是通过一些优先级来进行注册。1、实现了PriorityProcessor接口的类2、实现了 Order接口3、其他
 		//然后我们需要具体了解的接口就是MergedBeanDefinitionProcessor接口的类,
 		//在运行时用于合并bean定义的后处理器回调接口。 (用来在Spring实例化Bean的期间进行对Bean的定义的改变的后置处理器)
+		/**
+		 * 此时会实例化关于AOP功能的后置处理器:AnnotationAwareAspectJAutoProxyCreator.class
+		 * beanName :org.springframework.aop.config.internalAutoProxyCreator
+		 */
 		for (String ppName : postProcessorNames) {
 			if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 				BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
@@ -314,6 +318,7 @@ final class PostProcessorRegistrationDelegate {
 
 		// Re-register post-processor for detecting inner beans as ApplicationListeners,
 		// moving it to the end of the processor chain (for picking up proxies etc).
+		//注册ApplicationListenerDetector主要用来处理对单例Bean的标记
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(applicationContext));
 	}
 

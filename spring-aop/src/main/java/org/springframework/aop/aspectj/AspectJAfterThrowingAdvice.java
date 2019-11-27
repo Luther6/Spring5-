@@ -59,6 +59,13 @@ public class AspectJAfterThrowingAdvice extends AbstractAspectJAdvice
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
 		try {
+			/**
+			 * 因为我们的@afterThrowing的排序最前。所以首先调用。
+			 * 不得不佩服Spring。它在之前做的排序。在这里巧妙的解决了方法调用逻辑的问题。
+			 * 因为是afterThrowing()所以这里并不会调用。然后在最外层做了try-catch。所以说如果我们的通知方法报错。
+			 * 这里任然会被调用。
+			 */
+			//因为要首先要调用before 所以这里并不会执行
 			return mi.proceed();
 		}
 		catch (Throwable ex) {

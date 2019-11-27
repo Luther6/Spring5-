@@ -81,33 +81,50 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 	 * @see #isEligibleBean
 	 */
 	public List<Advisor> buildAspectJAdvisors() {
+		//缓存
 		List<String> aspectNames = this.aspectBeanNames;
-
+		//做了两次并发控制防止多线程干扰
 		if (aspectNames == null) {
 			synchronized (this) {
 				aspectNames = this.aspectBeanNames;
 				if (aspectNames == null) {
 					List<Advisor> advisors = new ArrayList<>();
 					aspectNames = new ArrayList<>();
+					//从Spring 容器中获取所有的beanName
 					String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
 							this.beanFactory, Object.class, true, false);
 					for (String beanName : beanNames) {
+						/**
+						 * 这里是用来配合 XML<aop:include name ="XXX.regx"></aop:include> 来对Aspect类做正则匹配的
+						 * 如果不匹配默认过滤掉。
+						 * 如果没有开启那么默认所有的Bean都合格。
+						 */
 						if (!isEligibleBean(beanName)) {
 							continue;
 						}
 						// We must be careful not to instantiate beans eagerly as in this case they
 						// would be cached by the Spring container but would not have been weaved.
+						//用来判断类型是否为空
 						Class<?> beanType = this.beanFactory.getType(beanName);
 						if (beanType == null) {
 							continue;
 						}
+						//判断该Bean是否是Aspect类型的。并且没有被AspectJ编译过。(ajc$:开头表示被代理过)
 						if (this.advisorFactory.isAspect(beanType)) {
+							//缓存-->表示已经解析过-->aspectBeanNames
 							aspectNames.add(beanName);
+							/**
+							 * 生成一个AspectMetadata主要是来确定Scope与使用源Aspect:因为加上@Configuration会被进行一层CGLib代理
+							 */
 							AspectMetadata amd = new AspectMetadata(beanType, beanName);
+							//判断是否是SINGLETON类型。默认为SINGLETON
 							if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
+								//构建一个用来 Aspect.class的工厂 : BeanFactoryAspectInstanceFactory
 								MetadataAwareAspectInstanceFactory factory =
 										new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);
+								//查找该类下的所有的Advisor
 								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);
+								//查看该切面类是否是单例的,并缓存。(作用之后分析)
 								if (this.beanFactory.isSingleton(beanName)) {
 									this.advisorsCache.put(beanName, classAdvisors);
 								}
@@ -116,6 +133,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 								}
 								advisors.addAll(classAdvisors);
 							}
+							//对于原型的切面类进行分析。之后看把
 							else {
 								// Per target or per this.
 								if (this.beanFactory.isSingleton(beanName)) {
@@ -139,11 +157,16 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 			return Collections.emptyList();
 		}
 		List<Advisor> advisors = new ArrayList<>();
+		//把所有解析过的切面类缓存到 advisorsCache中
+		/**
+		 * 还有就是下次这个类过来的时候直接从缓存中拿取之前解析过的通知。
+		 */
 		for (String aspectName : aspectNames) {
 			List<Advisor> cachedAdvisors = this.advisorsCache.get(aspectName);
 			if (cachedAdvisors != null) {
 				advisors.addAll(cachedAdvisors);
 			}
+			//进行再次解析???之后看
 			else {
 				MetadataAwareAspectInstanceFactory factory = this.aspectFactoryCache.get(aspectName);
 				advisors.addAll(this.advisorFactory.getAdvisors(factory));

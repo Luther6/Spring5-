@@ -65,11 +65,12 @@ public class BeanFactoryAdvisorRetrievalHelper {
 	 * @see #isEligibleBean
 	 */
 	public List<Advisor> findAdvisorBeans() {
-		// Determine list of advisor bean names, if not cached already.
+		// Determine list of advisor bean names, if not cached already.查找当前是否有实现了Advisor类型的Bean。并作缓存
 		String[] advisorNames = this.cachedAdvisorBeanNames;
 		if (advisorNames == null) {
 			// Do not initialize FactoryBeans here: We need to leave all regular beans
 			// uninitialized to let the auto-proxy creator apply to them!
+			// 从beanFactory中根据advisor查找,并做缓存。
 			advisorNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
 					this.beanFactory, Advisor.class, true, false);
 			this.cachedAdvisorBeanNames = advisorNames;
@@ -77,7 +78,10 @@ public class BeanFactoryAdvisorRetrievalHelper {
 		if (advisorNames.length == 0) {
 			return new ArrayList<>();
 		}
-
+		/**
+		 * 当前我们先不考虑这种情况了。就是当前容器中存在实现了Advisor接口的Bean。这些关于到XML配置。之后看。
+		 */
+		//TODO  之后来分析
 		List<Advisor> advisors = new ArrayList<>();
 		for (String name : advisorNames) {
 			if (isEligibleBean(name)) {

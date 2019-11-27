@@ -174,6 +174,7 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 
 	@Override
 	public ClassFilter getClassFilter() {
+		//解析@PonitCut()
 		obtainPointcutExpression();
 		return this;
 	}
@@ -194,7 +195,9 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 			throw new IllegalStateException("Must set property 'expression' before attempting to match");
 		}
 		if (this.pointcutExpression == null) {
+			//获取类加载器
 			this.pointcutClassLoader = determinePointcutClassLoader();
+			//构建切点表达式解析，并对pointcutExpression赋值
 			this.pointcutExpression = buildPointcutExpression(this.pointcutClassLoader);
 		}
 		return this.pointcutExpression;
@@ -220,10 +223,19 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 	private PointcutExpression buildPointcutExpression(@Nullable ClassLoader classLoader) {
 		PointcutParser parser = initializePointcutParser(classLoader);
 		PointcutParameter[] pointcutParameters = new PointcutParameter[this.pointcutParameterNames.length];
+		/**
+		 * 如果该通知方法有参数的话,那么这里将会对其进行解析,
+		 * 主要是按照顺序解析出参数的名称和参数的类型
+		 */
 		for (int i = 0; i < pointcutParameters.length; i++) {
 			pointcutParameters[i] = parser.createPointcutParameter(
 					this.pointcutParameterNames[i], this.pointcutParameterTypes[i]);
 		}
+		/**
+		 * 下面就是来解析@PonitCut方法具体逻辑
+		 * replaceBooleanOperators()对 and 与 or 进行转换
+		 * AspectJ的代码处理  目前看不懂。但是目的主要是用来对@pointCut注解解析出来然后对具体的切点表达式进行一定的转换
+		 */
 		return parser.parsePointcutExpression(replaceBooleanOperators(resolveExpression()),
 				this.pointcutDeclarationScope, pointcutParameters);
 	}
@@ -269,9 +281,11 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 
 	@Override
 	public boolean matches(Class<?> targetClass) {
+		//获取到之前我们解析注解时 获取到的切点表达式的值。方法的话则是 方法名
 		PointcutExpression pointcutExpression = obtainPointcutExpression();
 		try {
 			try {
+				//判断是否可以被作用上  (这里是AspectJ判断是否可以应用的地方。目前看不懂。。。。先不看了把。)
 				return pointcutExpression.couldMatchJoinPointsInType(targetClass);
 			}
 			catch (ReflectionWorldException ex) {

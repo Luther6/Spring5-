@@ -55,11 +55,13 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
+		//父方法就是用来进行beanFactory注入了。因为我们AOP需要获取到bean实例
 		super.setBeanFactory(beanFactory);
 		if (!(beanFactory instanceof ConfigurableListableBeanFactory)) {
 			throw new IllegalArgumentException(
 					"AdvisorAutoProxyCreator requires a ConfigurableListableBeanFactory: " + beanFactory);
 		}
+		//注意再这里初始化了一个 Advisor工厂。用来进行通知的生成 BeanFactoryAdvisorRetrievalHelperAdapter。调用的是子类的方法(从子类进来的嘛)
 		initBeanFactory((ConfigurableListableBeanFactory) beanFactory);
 	}
 
@@ -72,7 +74,9 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	@Nullable
 	protected Object[] getAdvicesAndAdvisorsForBean(
 			Class<?> beanClass, String beanName, @Nullable TargetSource targetSource) {
-
+		/**
+		 * 用来寻找符合的代理顾问(采用了哪些通知@Before,@After等应用了多少就返回多少。和配合使用的拦截器)
+		 */
 		List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);
 		if (advisors.isEmpty()) {
 			return DO_NOT_PROXY;
@@ -91,10 +95,17 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 * @see #extendAdvisors
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
+		//找到所有可以在自动代理中使用的候选通知(只要你声明的合法的通知都会拿到)之前解析过。缓存到了aspectJAdvisorsBuilder的adviserCache中
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
+		//对候选的通知进行过滤找到符合当前Bean的通知对象。这里面就比较复杂了。
+		/**
+		 * 判断当前的Class是否需要进行AOP如果需要,则根据切点表达式筛选到适合的顾问。
+		 */
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
+		//如果使用的是AspectJ的切点的话在这里会在advisor的头部添加一个 ExposeInvocationInterceptor 。下面看把
 		extendAdvisors(eligibleAdvisors);
 		if (!eligibleAdvisors.isEmpty()) {
+			//排序,按照执行现后顺序排序。就不看了
 			eligibleAdvisors = sortAdvisors(eligibleAdvisors);
 		}
 		return eligibleAdvisors;
@@ -106,7 +117,10 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 */
 	protected List<Advisor> findCandidateAdvisors() {
 		Assert.state(this.advisorRetrievalHelper != null, "No BeanFactoryAdvisorRetrievalHelper available");
+		//todo
 		return this.advisorRetrievalHelper.findAdvisorBeans();
+		//如果不考虑有实现了Advisor的bean注入到了容器中这里为null
+
 	}
 
 	/**
@@ -120,12 +134,13 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 */
 	protected List<Advisor> findAdvisorsThatCanApply(
 			List<Advisor> candidateAdvisors, Class<?> beanClass, String beanName) {
-
+		//设置当前代理的beanName
 		ProxyCreationContext.setCurrentProxiedBeanName(beanName);
 		try {
 			return AopUtils.findAdvisorsThatCanApply(candidateAdvisors, beanClass);
 		}
 		finally {
+			//找到了合适的advisor。我们接下来就要对bean进行代理的
 			ProxyCreationContext.setCurrentProxiedBeanName(null);
 		}
 	}

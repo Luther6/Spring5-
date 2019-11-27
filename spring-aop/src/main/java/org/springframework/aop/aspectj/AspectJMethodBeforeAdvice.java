@@ -38,7 +38,12 @@ public class AspectJMethodBeforeAdvice extends AbstractAspectJAdvice implements 
 		super(aspectJBeforeAdviceMethod, pointcut, aif);
 	}
 
-
+	/**
+	 *在生成的切面的动态代理中,当调用被切面作用的方法时,将会被拦截然后会调用该方法。
+	 * method:为切面作用的方法
+	 * args:方法参数
+	 * target:切面作用的方法所属的类。具体调用的逻辑之后看
+	 */
 	@Override
 	public void before(Method method, Object[] args, @Nullable Object target) throws Throwable {
 		invokeAdviceMethod(getJoinPointMatch(), null, null);

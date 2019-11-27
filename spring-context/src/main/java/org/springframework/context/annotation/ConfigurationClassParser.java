@@ -667,7 +667,8 @@ class ConfigurationClassParser {
 					}
 					/**
 					 * 处理ImportBeanDefinitionRegistrar类型的类{@link  com.luther.imports.ImportBDRegistryBean}
-					 *
+					 *	分析到AOP知道AOP是通过@EnableAspectJAutoProxy 使用@Import(AspectJAutoProxyRegistrar.class)来向我们的Spring的容器中注入一个AOP的后置处理器。
+					 * {@link org.springframework.context.annotation.EnableAspectJAutoProxy}
 					 */
 					else if (candidate.isAssignable(ImportBeanDefinitionRegistrar.class)) {
 						// Candidate class is an ImportBeanDefinitionRegistrar ->
@@ -697,6 +698,7 @@ class ConfigurationClassParser {
 						 * 到这里我终于明白?那为什么ImportBeanDefinitionRegistry不需要呢？因为我们刚刚分析了它缓存到了importBeanDefinitionRegistrars里面也是再ConfigurationClass中
 						 * ,厉害!
 						 * 先来详细了解一下这个方法candidate.asConfigClass(configClass),candidate的sourceClass作为ConfigurationClass作为主体,configclass就是作为ImportBy
+
 						 */
 						processConfigurationClass(candidate.asConfigClass(configClass));
 					}

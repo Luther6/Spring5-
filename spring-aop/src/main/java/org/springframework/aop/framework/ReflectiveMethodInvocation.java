@@ -159,12 +159,28 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	@Nullable
 	public Object proceed() throws Throwable {
 		// We start with an index of -1 and increment early.
+		/**
+		 * 这里为什么要定义 -1 开始呢。先不看,之后再分析@Around串起来看。
+		 *
+		 * ok,到了这主要是调用完@Around方法的procced()方法之前的逻辑就会到这里来判断。如果使用@Around而没有使用@Before的话。那么这里就相等了。
+		 * 所以我们就需要@Around方法自己来调用展示对象的方法。如果有的话。那么我们就不会去调用这个方法，而是委托给Before方法进行调度了。
+		 * 虽然最后还是统一到这个进行真实对象的方法调用。
+		 */
 		if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
+			//方式调用目标对象方法
 			return invokeJoinpoint();
+
+			//over
 		}
 
+		/**
+		 *  获取到第一个拦截器,在之前的分析我们知道Spring为我们使用AspectJ AOP 时插入了一个 ExposeInvocationInterceptor拦截器
+		 *  它会调用else 逻辑。它的作用是什么?
+		 *
+		 */
 		Object interceptorOrInterceptionAdvice =
 				this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);
+		//下面就是具体的通知调用的规则
 		if (interceptorOrInterceptionAdvice instanceof InterceptorAndDynamicMethodMatcher) {
 			// Evaluate dynamic method matcher here: static part will already have
 			// been evaluated and found to match.
@@ -172,6 +188,12 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 					(InterceptorAndDynamicMethodMatcher) interceptorOrInterceptionAdvice;
 			Class<?> targetClass = (this.targetClass != null ? this.targetClass : this.method.getDeclaringClass());
 			if (dm.methodMatcher.matches(this.method, targetClass, this.arguments)) {
+				/**
+				 *	这里就是具体的调用流程了。在这之前我们需要注意的是我们在之前对通知进行了排序。具体的排序顺序为
+				 *	(afterThrowing,afterReturning,afterReturn,around,before)
+				 *  在这里就全部分析了把。
+				 *
+				 */
 				return dm.interceptor.invoke(this);
 			}
 			else {
@@ -182,7 +204,8 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 		}
 		else {
 			// It's an interceptor, so we just invoke it: The pointcut will have
-			// been evaluated statically before this object was constructed.
+			// been evaluated statically before this object was constructed. todo
+			//ExposeInvocationInterceptor 对象
 			return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);
 		}
 	}

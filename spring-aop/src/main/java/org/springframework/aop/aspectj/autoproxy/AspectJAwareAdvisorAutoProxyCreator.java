@@ -97,14 +97,17 @@ public class AspectJAwareAdvisorAutoProxyCreator extends AbstractAdvisorAutoProx
 
 	@Override
 	protected boolean shouldSkip(Class<?> beanClass, String beanName) {
-		// TODO: Consider optimization by caching the list of the aspect names
+		// TODO: Consider optimization by caching the list of the aspect names,在合理将会考虑对Advisor进行缓存优化,人家之后要做的
+		// 小写的todo 我用来代表进入该方法了 ^-0 .这里主要是用来进行查找容器中存在的advisor 这里是从子类过来的所以会调用子类方法 AnnotationAwareAspectJAutoProxyCreator
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
+		//用来判断是否有通知类为AspectJPointcutAdvisor类型,不知道为啥经过流程下来讲道理是没有了,如果有的话且aspect的名称相同的话。那么就跳过(防止重复解析?)
 		for (Advisor advisor : candidateAdvisors) {
 			if (advisor instanceof AspectJPointcutAdvisor &&
 					((AspectJPointcutAdvisor) advisor).getAspectName().equals(beanName)) {
 				return true;
 			}
 		}
+		//判断这个bean是否可以被代理,会根据添加的后缀判断当前类是否需要跳过任何代理尝试。(不知道怎么用)
 		return super.shouldSkip(beanClass, beanName);
 	}
 

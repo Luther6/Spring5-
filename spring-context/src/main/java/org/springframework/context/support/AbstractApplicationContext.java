@@ -549,11 +549,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				 * 2、处理@Import 导入的三种类型的类
 				 * 3、对我们的配置类进行必要的代理
 				 * ....
+				 *
+				 * 注意点:AOP的后置处理器在此注册
 				 */
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
 				// 注册一些BeanPostProcessor,然后把bdMap中BeanPostProcessor 注册到BeanPostProcessors中
+				// 有一个重要的点。我们实现AOP的后置处理器就是在这里进行实例化的。
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
@@ -565,7 +568,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
-				//空方法,应该是之后来进行实现
+				//空方法,在SpringBoot创建Web容器的时候源码中有所添加
 				onRefresh();
 
 				// Check for listener beans and register them.

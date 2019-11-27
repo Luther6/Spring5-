@@ -126,23 +126,30 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 	/**
 	 * Find and return the first AspectJ annotation on the given method
 	 * (there <i>should</i> only be one anyway...).
+	 *
+	 * 根据方法来获取到AspectJ 注解。只能返回一个注解
 	 */
 	@SuppressWarnings("unchecked")
 	@Nullable
 	protected static AspectJAnnotation<?> findAspectJAnnotationOnMethod(Method method) {
+		//ASPECTJ_ANNOTATION_CLASSES  Pointcut.class, Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class
 		for (Class<?> clazz : ASPECTJ_ANNOTATION_CLASSES) {
+			//todo
 			AspectJAnnotation<?> foundAnnotation = findAnnotation(method, (Class<Annotation>) clazz);
 			if (foundAnnotation != null) {
 				return foundAnnotation;
 			}
 		}
+		//over
 		return null;
 	}
-
+	//A  Annotation
 	@Nullable
 	private static <A extends Annotation> AspectJAnnotation<A> findAnnotation(Method method, Class<A> toLookFor) {
+		//todo
 		A result = AnnotationUtils.findAnnotation(method, toLookFor);
 		if (result != null) {
+			//生成AspectAnnotation注解类型,进行一些数据的扩展。需要看一下。
 			return new AspectJAnnotation<>(result);
 		}
 		else {
@@ -193,7 +200,9 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 			this.annotation = annotation;
 			this.annotationType = determineAnnotationType(annotation);
 			try {
+				//对注解的pointcut 与 value 进行解析。现在使用的是 value 且值为一个方法名 pointcut()
 				this.pointcutExpression = resolveExpression(annotation);
+				//因为我们通知都有argueMents  :现在不太懂干嘛的。现在默认为 空
 				Object argNames = AnnotationUtils.getValue(annotation, "argNames");
 				this.argumentNames = (argNames instanceof String ? (String) argNames : "");
 			}

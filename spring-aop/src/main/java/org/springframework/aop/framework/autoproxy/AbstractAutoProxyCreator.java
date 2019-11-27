@@ -244,10 +244,42 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) {
 		Object cacheKey = getCacheKey(beanClass, beanName);
 
+		//判断该beanName是否为空,与当前的bean是否已经被自定义的AOP代理过。下面
 		if (!StringUtils.hasLength(beanName) || !this.targetSourcedBeans.contains(beanName)) {
+			//判断该bean是否是通知的基础bean或者是已经被判断能被作用到的Bean。如果是直接过滤掉
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
+			/**
+			 * isInfrastructureClass 判断是否是AOP基础设施类,Advisor,Advice,Pointcut。。
+			 * 来解释一下这里为什么会有基础Bean的存在吧。
+			 * 在Spring XML来配置AOP时我们可能会有这样的配置
+			 * 	 <bean class="com.luther.advice.AfterAdvisor" id="myafter"/>
+			 *     <aop:config>
+			 *
+			 *         <aop:pointcut id="mypoint" expression="execution(* com.luther.pojo.Advisor.adv())"/>
+			 *         <!--
+			 *         aop-advisor:这里需要在外面创建实现特定接口的类
+			 *         advice-ref:引入的是通知类配置名字，上面的某个bean，实现了特定的接口
+			 *         pointcut-ref:切点
+			 *
+			 *         还有一种方法<aop:aspect/>引入的就是(aspect包)
+			 *         -->
+			 *
+			 *         <aop:advisor advice-ref="mybefore" pointcut-ref="mypoint"/>
+			 *         <aop:advisor advice-ref="myafter" pointcut-ref="mypoint"/>
+			 *     </aop:config>
+			 *  我们这里的Bean可以在Spring中继承特定的接口来给Spring 做自动调用方法。主要我们实现这个方法。
+			 *  比如:{@link com.luther.aop.AopBasic} 。它就代表了一个通知这个通知我们不可能为通知再加上切面代理。所以这里进行了过滤。
+			 * shouldSkip: 判断是否应当被跳过。
+			 *
+			 * 如果应该被跳过会在adviseBeans中缓存该 cacheKey
+			 *
+			 * shouldSkip()中做了很多事情。分析  子类
+			 *
+			 *
+			 * 至此。如果当前类是一个Aspect类,那么他下面的所有通知都已被进行过解析且被缓存起来了缓存到 BeanFactoryAspectJAdvisorsBuilder /advisorsCache中
+			 */
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;
@@ -257,6 +289,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		// Create proxy here if we have a custom TargetSource.
 		// Suppresses unnecessary default instantiation of the target bean:
 		// The TargetSource will handle target instances in a custom fashion.
+		//判断对该bean创建一个自定义的目标对象。(没用过)。 之后看?
 		TargetSource targetSource = getCustomTargetSource(beanClass, beanName);
 		if (targetSource != null) {
 			if (StringUtils.hasLength(beanName)) {
@@ -287,15 +320,22 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	}
 
 	/**
+	 *
 	 * Create a proxy with the configured interceptors if the bean is
 	 * identified as one to proxy by the subclass.
 	 * @see #getAdvicesAndAdvisorsForBean
 	 */
 	@Override
 	public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
+		/**
+		 * 在这里来调用我们的AOP的后置处理器,来实现AOP(通过遍历)-->此时关于我们的ponitcut已经被解析了
+		 */
 		if (bean != null) {
+			//为当前bean(这里已经称为bean了也就是实例化完且进行了必要的注入)获取cacheKey如果是FactoryBean类型的话,那么这里将会在beanName中加上&
 			Object cacheKey = getCacheKey(bean.getClass(), beanName);
+			//判断是否有缓存
 			if (this.earlyProxyReferences.remove(cacheKey) != bean) {
+				//todo 对需要进行代理的类进行包装
 				return wrapIfNecessary(bean, beanName, cacheKey);
 			}
 		}
@@ -332,21 +372,30 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 * @return a proxy wrapping the bean, or the raw bean instance as-is
 	 */
 	protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) {
+		//查询缓存中是否存在,如果存在直接返回
 		if (StringUtils.hasLength(beanName) && this.targetSourcedBeans.contains(beanName)) {
 			return bean;
 		}
+		// 仍然是缓存操作。先不看了
 		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
 			return bean;
 		}
+		//之前的步骤,跳过基础设施类等
 		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
 			this.advisedBeans.put(cacheKey, Boolean.FALSE);
 			return bean;
 		}
 
 		// Create proxy if we have advice.
+		/**
+		 * 关于下面代码就是具体创建AOP代理的步骤了。感觉现在水平不够啊?好多代码看不懂。。。就简单的看一下目前。
+		 *	getAdvicesAndAdvisorsForBean()下面的代码就是用来判断是否需要进行AOP代理与并茶轴合适的通知
+		 */
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		if (specificInterceptors != DO_NOT_PROXY) {
+			// 缓存表示当前Bean被AOP代理过了
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
+			//创建代理,如果可以被切面作用到的话。这里将会返回一个代理对象。也就是说替换了我们原来的bean
 			Object proxy = createProxy(
 					bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
 			this.proxyTypes.put(cacheKey, proxy.getClass());
@@ -447,27 +496,31 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		}
 
 		ProxyFactory proxyFactory = new ProxyFactory();
+		//当前工厂的一些信息复制过去 如proxyTargetClass
 		proxyFactory.copyFrom(this);
-
+		//默认配置为false
 		if (!proxyFactory.isProxyTargetClass()) {
+			//根据preserveTargetClass来判断到底使用类进行代理还是使用接口进行代理,之后举例看把
 			if (shouldProxyTargetClass(beanClass, beanName)) {
 				proxyFactory.setProxyTargetClass(true);
 			}
 			else {
+				//获取该类以及其在同一个命名空间中的父类实现的接口。如果没有任何接口的话。那么则使用类进行代理。
 				evaluateProxyInterfaces(beanClass, proxyFactory);
 			}
 		}
-
+		//特殊的拦截器中如果包含advice那么需要转换为advisor
 		Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
 		proxyFactory.addAdvisors(advisors);
 		proxyFactory.setTargetSource(targetSource);
 		customizeProxyFactory(proxyFactory);
 
 		proxyFactory.setFrozen(this.freezeProxy);
+		//判断bean是否以及经过classFilter过滤
 		if (advisorsPreFiltered()) {
 			proxyFactory.setPreFiltered(true);
 		}
-
+		//创建代理
 		return proxyFactory.getProxy(getProxyClassLoader());
 	}
 

@@ -58,6 +58,8 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 	@Nullable
 	private BeanFactoryAspectJAdvisorsBuilder aspectJAdvisorsBuilder;
 
+	public AnnotationAwareAspectJAutoProxyCreator() {
+	}
 
 	/**
 	 * Set a list of regex patterns, matching eligible @AspectJ bean names.
@@ -77,21 +79,31 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 
 	@Override
 	protected void initBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+		//初始化父类 生成advisorRetrievalHelper
 		super.initBeanFactory(beanFactory);
 		if (this.aspectJAdvisorFactory == null) {
+			// 生成Advisor的工厂方法
 			this.aspectJAdvisorFactory = new ReflectiveAspectJAdvisorFactory(beanFactory);
 		}
+		//在这里生成了aspectJAdvisorsBuilder 生成的Advisor的构建类,很重要
 		this.aspectJAdvisorsBuilder =
 				new BeanFactoryAspectJAdvisorsBuilderAdapter(beanFactory, this.aspectJAdvisorFactory);
 	}
 
-
+	/**
+	 * 查找当前容器中的所有通知
+	 * @return
+	 */
 	@Override
 	protected List<Advisor> findCandidateAdvisors() {
 		// Add all the Spring advisors found according to superclass rules.
+		//todo
 		List<Advisor> advisors = super.findCandidateAdvisors();
 		// Build Advisors for all AspectJ aspects in the bean factory.
+		//在获取完显示的注入到Spring 容器的Advisor Bean的话。下面就是来解析注入注解配置的Advisor对象
+		//aspectJAdvisorsBuilder 注意这里在之前调用BeanFactoryAware步骤时进行了初始化
 		if (this.aspectJAdvisorsBuilder != null) {
+			//todo.进行advisor的构建工作
 			advisors.addAll(this.aspectJAdvisorsBuilder.buildAspectJAdvisors());
 		}
 		return advisors;
