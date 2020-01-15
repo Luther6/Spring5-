@@ -236,7 +236,7 @@ public class AnnotatedBeanDefinitionReader {
 		if (this.conditionEvaluator.shouldSkip(abd.getMetadata())) {
 			return;
 		}
-		//???,后面应该有用到
+		//???,设置当前实例化的提供商
 		abd.setInstanceSupplier(instanceSupplier);
 		/**
 		 * 得到类的作用域

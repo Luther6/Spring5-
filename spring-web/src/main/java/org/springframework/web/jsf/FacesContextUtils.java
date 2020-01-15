@@ -39,12 +39,12 @@ import org.springframework.web.util.WebUtils;
 public abstract class FacesContextUtils {
 
 	/**
-	 * Find the root {@link WebApplicationContext} for this web app, typically
+	 * Find the root {@link WebApplicationContext} for this web config, typically
 	 * loaded via {@link org.springframework.web.context.ContextLoaderListener}.
 	 * <p>Will rethrow an exception that happened on root context startup,
 	 * to differentiate between a failed context startup and no context at all.
 	 * @param fc the FacesContext to find the web application context for
-	 * @return the root WebApplicationContext for this web app, or {@code null} if none
+	 * @return the root WebApplicationContext for this web config, or {@code null} if none
 	 * @see org.springframework.web.context.WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE
 	 */
 	@Nullable
@@ -68,12 +68,12 @@ public abstract class FacesContextUtils {
 	}
 
 	/**
-	 * Find the root {@link WebApplicationContext} for this web app, typically
+	 * Find the root {@link WebApplicationContext} for this web config, typically
 	 * loaded via {@link org.springframework.web.context.ContextLoaderListener}.
 	 * <p>Will rethrow an exception that happened on root context startup,
 	 * to differentiate between a failed context startup and no context at all.
 	 * @param fc the FacesContext to find the web application context for
-	 * @return the root WebApplicationContext for this web app
+	 * @return the root WebApplicationContext for this web config
 	 * @throws IllegalStateException if the root WebApplicationContext could not be found
 	 * @see org.springframework.web.context.WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE
 	 */

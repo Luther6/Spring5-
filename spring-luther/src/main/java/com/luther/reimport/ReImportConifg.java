@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * @author liujie
  * @datetime 2019/11/6 19:06
  */
-//@Component
+@Component
 @Import(ImportBean.class)
 public class ReImportConifg {
 }

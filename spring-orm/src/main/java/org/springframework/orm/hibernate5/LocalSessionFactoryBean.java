@@ -219,7 +219,7 @@ public class LocalSessionFactoryBean extends HibernateExceptionTranslator
 	}
 
 	/**
-	 * Set locations of cacheable Hibernate mapping files, for example as web app
+	 * Set locations of cacheable Hibernate mapping files, for example as web config
 	 * resource "/WEB-INF/mapping/example.hbm.xml". Supports any resource location
 	 * via Spring's resource abstraction, as long as the resource can be resolved
 	 * in the file system.

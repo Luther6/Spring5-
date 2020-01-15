@@ -268,7 +268,7 @@ public class PropertyResourceConfigurerTests {
 			props.setProperty("tb2.age", "99");
 			props.setProperty("tb2.name", "test2");
 			poc.setProperties(props);
-			poc.setOrder(0); // won't actually do anything since we're not processing through an app ctx
+			poc.setOrder(0); // won't actually do anything since we're not processing through an config ctx
 			try {
 				poc.postProcessBeanFactory(factory);
 			}
@@ -290,7 +290,7 @@ public class PropertyResourceConfigurerTests {
 			props.setProperty("tb2.age", "99");
 			props.setProperty("tb2.name", "test2");
 			poc.setProperties(props);
-			poc.setOrder(0); // won't actually do anything since we're not processing through an app ctx
+			poc.setOrder(0); // won't actually do anything since we're not processing through an config ctx
 			poc.postProcessBeanFactory(factory);
 		}
 		{

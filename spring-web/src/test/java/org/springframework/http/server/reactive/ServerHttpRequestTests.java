@@ -105,9 +105,9 @@ public class ServerHttpRequestTests {
 		request = createHttpRequest(baseUri).mutate().path("/b/c/d").build();
 		assertEquals("http://www.aaa.org/b/c/d", request.getURI().toString());
 
-		request = createHttpRequest(baseUri).mutate().path("/app/b/c/d").contextPath("/app").build();
-		assertEquals("http://www.aaa.org/app/b/c/d", request.getURI().toString());
-		assertEquals("/app", request.getPath().contextPath().value());
+		request = createHttpRequest(baseUri).mutate().path("/config/b/c/d").contextPath("/config").build();
+		assertEquals("http://www.aaa.org/config/b/c/d", request.getURI().toString());
+		assertEquals("/config", request.getPath().contextPath().value());
 	}
 
 	@Test(expected = IllegalArgumentException.class)

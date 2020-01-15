@@ -168,24 +168,24 @@ public class ServletUriComponentsBuilderTests {
 
 	@Test
 	public void fromServletMapping() {
-		this.request.setRequestURI("/mvc-showcase/app/simple");
-		this.request.setServletPath("/app");
+		this.request.setRequestURI("/mvc-showcase/config/simple");
+		this.request.setServletPath("/config");
 		this.request.setQueryString("foo=123");
 		String result = ServletUriComponentsBuilder.fromServletMapping(this.request).build().toUriString();
-		assertEquals("http://localhost/mvc-showcase/app", result);
+		assertEquals("http://localhost/mvc-showcase/config", result);
 	}
 
 	@Test // SPR-16650
 	public void fromServletMappingWithForwardedPrefix() throws Exception {
 		this.request.addHeader("X-Forwarded-Prefix", "/prefix");
 		this.request.setContextPath("/mvc-showcase");
-		this.request.setServletPath("/app");
-		this.request.setRequestURI("/mvc-showcase/app/simple");
+		this.request.setServletPath("/config");
+		this.request.setRequestURI("/mvc-showcase/config/simple");
 
 		HttpServletRequest requestToUse = adaptFromForwardedHeaders(this.request);
 		String result = ServletUriComponentsBuilder.fromServletMapping(requestToUse).build().toUriString();
 
-		assertEquals("http://localhost/prefix/app", result);
+		assertEquals("http://localhost/prefix/config", result);
 	}
 
 	@Test

@@ -33,14 +33,14 @@ import org.springframework.core.io.support.PropertySourceFactory;
  *
  * <h3>Example usage</h3>
  *
- * <p>Given a file {@code app.properties} containing the key/value pair
+ * <p>Given a file {@code config.properties} containing the key/value pair
  * {@code testbean.name=myTestBean}, the following {@code @Configuration} class
- * uses {@code @PropertySource} to contribute {@code app.properties} to the
+ * uses {@code @PropertySource} to contribute {@code config.properties} to the
  * {@code Environment}'s set of {@code PropertySources}.
  *
  * <pre class="code">
  * &#064;Configuration
- * &#064;PropertySource("classpath:/com/myco/app.properties")
+ * &#064;PropertySource("classpath:/com/myco/config.properties")
  * public class AppConfig {
  *
  *     &#064;Autowired
@@ -83,7 +83,7 @@ import org.springframework.core.io.support.PropertySourceFactory;
  *
  * <pre class="code">
  * &#064;Configuration
- * &#064;PropertySource("classpath:/com/${my.placeholder:default/path}/app.properties")
+ * &#064;PropertySource("classpath:/com/${my.placeholder:default/path}/config.properties")
  * public class AppConfig {
  *
  *     &#064;Autowired
@@ -180,7 +180,7 @@ public @interface PropertySource {
 	/**
 	 * Indicate the resource location(s) of the properties file to be loaded.
 	 * <p>Both traditional and XML-based properties file formats are supported
-	 * &mdash; for example, {@code "classpath:/com/myco/app.properties"}
+	 * &mdash; for example, {@code "classpath:/com/myco/config.properties"}
 	 * or {@code "file:/path/to/file.xml"}.
 	 * <p>Resource location wildcards (e.g. *&#42;/*.properties) are not permitted;
 	 * each location must evaluate to exactly one {@code .properties} resource.

@@ -70,12 +70,12 @@ public abstract class WebApplicationContextUtils {
 
 
 	/**
-	 * Find the root {@code WebApplicationContext} for this web app, typically
+	 * Find the root {@code WebApplicationContext} for this web config, typically
 	 * loaded via {@link org.springframework.web.context.ContextLoaderListener}.
 	 * <p>Will rethrow an exception that happened on root context startup,
 	 * to differentiate between a failed context startup and no context at all.
 	 * @param sc the ServletContext to find the web application context for
-	 * @return the root WebApplicationContext for this web app
+	 * @return the root WebApplicationContext for this web config
 	 * @throws IllegalStateException if the root WebApplicationContext could not be found
 	 * @see org.springframework.web.context.WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE
 	 */
@@ -88,12 +88,12 @@ public abstract class WebApplicationContextUtils {
 	}
 
 	/**
-	 * Find the root {@code WebApplicationContext} for this web app, typically
+	 * Find the root {@code WebApplicationContext} for this web config, typically
 	 * loaded via {@link org.springframework.web.context.ContextLoaderListener}.
 	 * <p>Will rethrow an exception that happened on root context startup,
 	 * to differentiate between a failed context startup and no context at all.
 	 * @param sc the ServletContext to find the web application context for
-	 * @return the root WebApplicationContext for this web app, or {@code null} if none
+	 * @return the root WebApplicationContext for this web config, or {@code null} if none
 	 * @see org.springframework.web.context.WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE
 	 */
 	@Nullable
@@ -102,10 +102,10 @@ public abstract class WebApplicationContextUtils {
 	}
 
 	/**
-	 * Find a custom {@code WebApplicationContext} for this web app.
+	 * Find a custom {@code WebApplicationContext} for this web config.
 	 * @param sc the ServletContext to find the web application context for
 	 * @param attrName the name of the ServletContext attribute to look for
-	 * @return the desired WebApplicationContext for this web app, or {@code null} if none
+	 * @return the desired WebApplicationContext for this web config, or {@code null} if none
 	 */
 	@Nullable
 	public static WebApplicationContext getWebApplicationContext(ServletContext sc, String attrName) {
@@ -130,16 +130,16 @@ public abstract class WebApplicationContextUtils {
 	}
 
 	/**
-	 * Find a unique {@code WebApplicationContext} for this web app: either the
-	 * root web app context (preferred) or a unique {@code WebApplicationContext}
+	 * Find a unique {@code WebApplicationContext} for this web config: either the
+	 * root web config context (preferred) or a unique {@code WebApplicationContext}
 	 * among the registered {@code ServletContext} attributes (typically coming
 	 * from a single {@code DispatcherServlet} in the current web application).
 	 * <p>Note that {@code DispatcherServlet}'s exposure of its context can be
 	 * controlled through its {@code publishContext} property, which is {@code true}
 	 * by default but can be selectively switched to only publish a single context
-	 * despite multiple {@code DispatcherServlet} registrations in the web app.
+	 * despite multiple {@code DispatcherServlet} registrations in the web config.
 	 * @param sc the ServletContext to find the web application context for
-	 * @return the desired WebApplicationContext for this web app, or {@code null} if none
+	 * @return the desired WebApplicationContext for this web config, or {@code null} if none
 	 * @since 4.2
 	 * @see #getWebApplicationContext(ServletContext)
 	 * @see ServletContext#getAttributeNames()
@@ -221,6 +221,7 @@ public abstract class WebApplicationContextUtils {
 	public static void registerEnvironmentBeans(ConfigurableListableBeanFactory bf,
 			@Nullable ServletContext servletContext, @Nullable ServletConfig servletConfig) {
 
+		//注册servletContext到当前的Spring容器上下文中
 		if (servletContext != null && !bf.containsBean(WebApplicationContext.SERVLET_CONTEXT_BEAN_NAME)) {
 			bf.registerSingleton(WebApplicationContext.SERVLET_CONTEXT_BEAN_NAME, servletContext);
 		}
@@ -228,7 +229,9 @@ public abstract class WebApplicationContextUtils {
 		if (servletConfig != null && !bf.containsBean(ConfigurableWebApplicationContext.SERVLET_CONFIG_BEAN_NAME)) {
 			bf.registerSingleton(ConfigurableWebApplicationContext.SERVLET_CONFIG_BEAN_NAME, servletConfig);
 		}
-
+		//实例化并注册contextParameters与contextAttributes到Spring容器中
+		//contextParameters纯了web.xml中配置的配置文件等相关信息
+		//contextAttributes spring中的一些环境属性
 		if (!bf.containsBean(WebApplicationContext.CONTEXT_PARAMETERS_BEAN_NAME)) {
 			Map<String, String> parameterMap = new HashMap<>();
 			if (servletContext != null) {

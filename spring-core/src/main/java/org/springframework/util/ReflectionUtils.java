@@ -400,9 +400,10 @@ public abstract class ReflectionUtils {
 	 * @throws IllegalStateException if introspection fails
 	 */
 	public static void doWithMethods(Class<?> clazz, MethodCallback mc, @Nullable MethodFilter mf) {
-		// Keep backing up the inheritance hierarchy.
+		// Keep backing up the inheritance hierarchy
 		Method[] methods = getDeclaredMethods(clazz);
 		for (Method method : methods) {
+			//解析方法过滤
 			if (mf != null && !mf.matches(method)) {
 				continue;
 			}

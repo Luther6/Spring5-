@@ -50,7 +50,7 @@ import org.springframework.web.context.ServletContextAware;
  * method.</b>
  *
  * <p>Interprets resource paths as servlet context resources, i.e. as paths beneath
- * the web application root. Absolute paths, e.g. for files outside the web app root,
+ * the web application root. Absolute paths, e.g. for files outside the web config root,
  * can be accessed via "file:" URLs, as implemented by AbstractApplicationContext.
  *
  * <p>In addition to the special beans detected by

@@ -632,9 +632,11 @@ public abstract class AnnotatedElementUtils {
 	@Nullable
 	public static AnnotationAttributes findMergedAnnotationAttributes(AnnotatedElement element,
 			Class<? extends Annotation> annotationType, boolean classValuesAsString, boolean nestedAnnotationsAsMap) {
-
+		//根据给定的注解类型,对当前注解进行搜索(对元注解来进行搜索。。)
 		AnnotationAttributes attributes = searchWithFindSemantics(element, annotationType, null,
 				new MergedAnnotationAttributesProcessor(classValuesAsString, nestedAnnotationsAsMap));
+		//注解处理器的后置处理器,主要是用来对Spring中定义的注解@AlicaeFor来进行值的处理操作(在@GetMapping中我们可以看到这样的写法)
+		//EG:@GetMapping的值,赋予到@RequestMapping注解上
 		AnnotationUtils.postProcessAnnotationAttributes(element, attributes, classValuesAsString, nestedAnnotationsAsMap);
 		return attributes;
 	}
@@ -707,8 +709,9 @@ public abstract class AnnotatedElementUtils {
 			return null;
 		}
 
-		// Exhaustive retrieval of merged annotation attributes...
+		// Exhaustive retrieval of merged annotation attributes...在当前注解基础上搜索指定类型的注解并对注解的值进行处理
 		AnnotationAttributes attributes = findMergedAnnotationAttributes(element, annotationType, false, false);
+		//根据给定的注解类型查找到的属性值,对其进行合并并生成给定的注解类型的对象(不太懂之后看)
 		return (attributes != null ? AnnotationUtils.synthesizeAnnotation(attributes, annotationType, element) : null);
 	}
 

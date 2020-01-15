@@ -4,8 +4,8 @@ dependencies {
 	compile(project(":spring-beans"))
 	compile(project(":spring-context"))
 	compile(project(":spring-core"))
-	optional(project(":spring-jdbc"))  // for Quartz support
-	optional(project(":spring-tx"))  // for Quartz support
+	compile(project(":spring-jdbc"))  // for Quartz support
+	compile(project(":spring-tx"))  // for Quartz support
 	optional("javax.activation:javax.activation-api:1.2.0")
 	optional("javax.mail:javax.mail-api:1.6.2")
 	optional("javax.cache:cache-api:1.1.0")

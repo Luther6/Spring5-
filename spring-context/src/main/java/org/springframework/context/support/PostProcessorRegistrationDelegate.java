@@ -249,7 +249,7 @@ final class PostProcessorRegistrationDelegate {
 		// Register BeanPostProcessorChecker that logs an info message when
 		// a bean is created during BeanPostProcessor instantiation, i.e. when
 		// a bean is not eligible for getting processed by all BeanPostProcessors.
-		// 有一部分的BeanPostProcessor,简称bpp,是存在在bdMap中,这以部分是在Spring最初存取实现了BeanFactoryPostProcessor接口的一起存放到了bdMap中,
+		// 有一部分的BeanPostProcessor,简称bpp,是存在在bdMap中,这部分是在Spring最初存取实现了BeanFactoryPostProcessor接口的一起存放到了bdMap中,
 		// 而有一部分则是存在了BeanFactory的beanPostProcessors的list集合中.
 		int beanProcessorTargetCount = beanFactory.getBeanPostProcessorCount() + 1 + postProcessorNames.length;
 		// 这个处理器用来记录在bpp运行期间产生的Bean,具体下面看

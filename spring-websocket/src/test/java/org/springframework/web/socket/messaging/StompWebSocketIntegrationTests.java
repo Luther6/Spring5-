@@ -89,7 +89,7 @@ public class StompWebSocketIntegrationTests extends AbstractWebSocketIntegration
 
 	@Test
 	public void sendMessageToController() throws Exception {
-		TextMessage message = create(StompCommand.SEND).headers("destination:/app/simple").build();
+		TextMessage message = create(StompCommand.SEND).headers("destination:/config/simple").build();
 		WebSocketSession session = doHandshake(new TestClientWebSocketHandler(0, message), "/ws").get();
 
 		SimpleController controller = this.wac.getBean(SimpleController.class);
@@ -107,7 +107,7 @@ public class StompWebSocketIntegrationTests extends AbstractWebSocketIntegration
 		TextMessage m1 = create(StompCommand.SUBSCRIBE)
 				.headers("id:subs1", "destination:/topic/increment").build();
 		TextMessage m2 = create(StompCommand.SEND)
-				.headers("destination:/app/increment").body("5").build();
+				.headers("destination:/config/increment").body("5").build();
 
 		TestClientWebSocketHandler clientHandler = new TestClientWebSocketHandler(2, m0, m1, m2);
 		WebSocketSession session = doHandshake(clientHandler, "/ws").get();
@@ -143,7 +143,7 @@ public class StompWebSocketIntegrationTests extends AbstractWebSocketIntegration
 	@Test  // SPR-11648
 	public void sendSubscribeToControllerAndReceiveReply() throws Exception {
 		TextMessage m0 = create(StompCommand.CONNECT).headers("accept-version:1.1").build();
-		String destHeader = "destination:/app/number";
+		String destHeader = "destination:/config/number";
 		TextMessage m1 = create(StompCommand.SUBSCRIBE).headers("id:subs1", destHeader).build();
 
 		TestClientWebSocketHandler clientHandler = new TestClientWebSocketHandler(2, m0, m1);
@@ -152,7 +152,7 @@ public class StompWebSocketIntegrationTests extends AbstractWebSocketIntegration
 		try {
 			assertTrue(clientHandler.latch.await(TIMEOUT, TimeUnit.SECONDS));
 			String payload = clientHandler.actual.get(1).getPayload();
-			assertTrue("Expected STOMP destination=/app/number, got " + payload, payload.contains(destHeader));
+			assertTrue("Expected STOMP destination=/config/number, got " + payload, payload.contains(destHeader));
 			assertTrue("Expected STOMP Payload=42, got " + payload, payload.contains("42"));
 		}
 		finally {
@@ -165,7 +165,7 @@ public class StompWebSocketIntegrationTests extends AbstractWebSocketIntegration
 		String destHeader = "destination:/user/queue/error";
 		TextMessage m0 = create(StompCommand.CONNECT).headers("accept-version:1.1").build();
 		TextMessage m1 = create(StompCommand.SUBSCRIBE).headers("id:subs1", destHeader).build();
-		TextMessage m2 = create(StompCommand.SEND).headers("destination:/app/exception").build();
+		TextMessage m2 = create(StompCommand.SEND).headers("destination:/config/exception").build();
 
 		TestClientWebSocketHandler clientHandler = new TestClientWebSocketHandler(2, m0, m1, m2);
 		WebSocketSession session = doHandshake(clientHandler, "/ws").get();
@@ -188,7 +188,7 @@ public class StompWebSocketIntegrationTests extends AbstractWebSocketIntegration
 		TextMessage m1 = create(StompCommand.SUBSCRIBE)
 				.headers("id:subs1", "destination:/topic/scopedBeanValue").build();
 		TextMessage m2 = create(StompCommand.SEND)
-				.headers("destination:/app/scopedBeanValue").build();
+				.headers("destination:/config/scopedBeanValue").build();
 
 		TestClientWebSocketHandler clientHandler = new TestClientWebSocketHandler(2, m0, m1, m2);
 		WebSocketSession session = doHandshake(clientHandler, "/ws").get();
@@ -336,7 +336,7 @@ public class StompWebSocketIntegrationTests extends AbstractWebSocketIntegration
 
 		@Override
 		public void configureMessageBroker(MessageBrokerRegistry configurer) {
-			configurer.setApplicationDestinationPrefixes("/app");
+			configurer.setApplicationDestinationPrefixes("/config");
 			configurer.enableSimpleBroker("/topic", "/queue");
 		}
 

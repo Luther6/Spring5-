@@ -138,7 +138,7 @@ public class WebSocketStompClientIntegrationTests {
 
 		@Override
 		public void configureMessageBroker(MessageBrokerRegistry configurer) {
-			configurer.setApplicationDestinationPrefixes("/app");
+			configurer.setApplicationDestinationPrefixes("/config");
 			configurer.enableSimpleBroker("/topic", "/queue");
 		}
 	}

@@ -34,7 +34,7 @@ public class ImplicitJPArgumentMatchingAtAspectJTests {
 
 	@Test
 	public void testAspect() {
-		// nothing to really test; it is enough if we don't get error while creating app context
+		// nothing to really test; it is enough if we don't get error while creating config context
 		new ClassPathXmlApplicationContext(getClass().getSimpleName() + ".xml", getClass());
 	}
 

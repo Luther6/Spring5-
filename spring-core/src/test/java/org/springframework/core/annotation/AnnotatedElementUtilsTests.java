@@ -628,7 +628,7 @@ public class AnnotatedElementUtilsTests {
 
 	@Test
 	public void findMergedAnnotationAttributesOnClassWithAttributeAliasInComposedAnnotationAndNestedAnnotationsInTargetAnnotation() {
-		AnnotationAttributes attributes = assertComponentScanAttributes(TestComponentScanClass.class, "com.example.app.test");
+		AnnotationAttributes attributes = assertComponentScanAttributes(TestComponentScanClass.class, "com.example.config.test");
 
 		Filter[] excludeFilters = attributes.getAnnotationArray("excludeFilters", Filter.class);
 		assertNotNull(excludeFilters);
@@ -644,17 +644,17 @@ public class AnnotatedElementUtilsTests {
 	 */
 	@Test
 	public void findMergedAnnotationAttributesOnClassWithBothAttributesOfAnAliasPairDeclared() {
-		assertComponentScanAttributes(ComponentScanWithBasePackagesAndValueAliasClass.class, "com.example.app.test");
+		assertComponentScanAttributes(ComponentScanWithBasePackagesAndValueAliasClass.class, "com.example.config.test");
 	}
 
 	@Test
 	public void findMergedAnnotationAttributesWithSingleElementOverridingAnArrayViaConvention() {
-		assertComponentScanAttributes(ConventionBasedSinglePackageComponentScanClass.class, "com.example.app.test");
+		assertComponentScanAttributes(ConventionBasedSinglePackageComponentScanClass.class, "com.example.config.test");
 	}
 
 	@Test
 	public void findMergedAnnotationAttributesWithSingleElementOverridingAnArrayViaAliasFor() {
-		assertComponentScanAttributes(AliasForBasedSinglePackageComponentScanClass.class, "com.example.app.test");
+		assertComponentScanAttributes(AliasForBasedSinglePackageComponentScanClass.class, "com.example.config.test");
 	}
 
 	private AnnotationAttributes assertComponentScanAttributes(Class<?> element, String... expected) {
@@ -1324,19 +1324,19 @@ public class AnnotatedElementUtilsTests {
 	static class AliasedComposedContextConfigAndTestPropSourceClass {
 	}
 
-	@ComponentScan(value = "com.example.app.test", basePackages = "com.example.app.test")
+	@ComponentScan(value = "com.example.config.test", basePackages = "com.example.config.test")
 	static class ComponentScanWithBasePackagesAndValueAliasClass {
 	}
 
-	@TestComponentScan(packages = "com.example.app.test")
+	@TestComponentScan(packages = "com.example.config.test")
 	static class TestComponentScanClass {
 	}
 
-	@ConventionBasedSinglePackageComponentScan(basePackages = "com.example.app.test")
+	@ConventionBasedSinglePackageComponentScan(basePackages = "com.example.config.test")
 	static class ConventionBasedSinglePackageComponentScanClass {
 	}
 
-	@AliasForBasedSinglePackageComponentScan(pkg = "com.example.app.test")
+	@AliasForBasedSinglePackageComponentScan(pkg = "com.example.config.test")
 	static class AliasForBasedSinglePackageComponentScanClass {
 	}
 

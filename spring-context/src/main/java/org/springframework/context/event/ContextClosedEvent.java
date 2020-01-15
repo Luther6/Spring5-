@@ -33,8 +33,8 @@ public class ContextClosedEvent extends ApplicationContextEvent {
 	 * @param source the {@code ApplicationContext} that has been closed
 	 * (must not be {@code null})
 	 */
-	public ContextClosedEvent(ApplicationContext source) {
-		super(source);
+	public ContextClosedEvent(ApplicationContext source){
+			super(source);
 	}
 
 }

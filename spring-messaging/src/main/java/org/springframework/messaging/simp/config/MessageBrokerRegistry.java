@@ -125,7 +125,7 @@ public class MessageBrokerRegistry {
 
 	/**
 	 * Configure one or more prefixes to filter destinations targeting application
-	 * annotated methods. For example destinations prefixed with "/app" may be
+	 * annotated methods. For example destinations prefixed with "/config" may be
 	 * processed by annotated methods while other destinations may target the
 	 * message broker (e.g. "/topic", "/queue").
 	 * <p>When messages are processed, the matching prefix is removed from the destination
@@ -191,7 +191,7 @@ public class MessageBrokerRegistry {
 	 * separator or provide a completely different PathMatcher implementation.
 	 * <p>Note that the configured PathMatcher is only used for matching the
 	 * portion of the destination after the configured prefix. For example given
-	 * application destination prefix "/app" and destination "/app/price.stock.**",
+	 * application destination prefix "/config" and destination "/config/price.stock.**",
 	 * the message might be mapped to a controller with "price" and "stock.**"
 	 * as its type and method-level mappings respectively.
 	 * <p>When the simple broker is enabled, the PathMatcher configured here is

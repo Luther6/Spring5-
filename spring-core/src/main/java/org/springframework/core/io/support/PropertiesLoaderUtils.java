@@ -119,6 +119,7 @@ public abstract class PropertiesLoaderUtils {
 	 */
 	public static Properties loadProperties(Resource resource) throws IOException {
 		Properties props = new Properties();
+		//加载ContextLoader.properties并初始化props
 		fillProperties(props, resource);
 		return props;
 	}
@@ -130,6 +131,7 @@ public abstract class PropertiesLoaderUtils {
 	 * @throws IOException if loading failed
 	 */
 	public static void fillProperties(Properties props, Resource resource) throws IOException {
+		//ClassPathResource#getInputStream
 		InputStream is = resource.getInputStream();
 		try {
 			String filename = resource.getFilename();

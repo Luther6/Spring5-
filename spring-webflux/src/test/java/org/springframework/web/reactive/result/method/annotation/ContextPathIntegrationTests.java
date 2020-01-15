@@ -89,7 +89,7 @@ public class ContextPathIntegrationTests {
 
 		File base = new File(System.getProperty("java.io.tmpdir"));
 		TomcatHttpServer server = new TomcatHttpServer(base.getAbsolutePath());
-		server.setContextPath("/app");
+		server.setContextPath("/config");
 		server.setServletMapping("/api/*");
 
 		HttpHandler httpHandler = WebHttpHandlerBuilder.applicationContext(context).build();
@@ -102,9 +102,9 @@ public class ContextPathIntegrationTests {
 			RestTemplate restTemplate = new RestTemplate();
 			String actual;
 
-			String url = "http://localhost:" + server.getPort() + "/app/api/test";
+			String url = "http://localhost:" + server.getPort() + "/config/api/test";
 			actual = restTemplate.getForObject(url, String.class);
-			assertEquals("Tested in /app/api", actual);
+			assertEquals("Tested in /config/api", actual);
 		}
 		finally {
 			server.stop();

@@ -90,17 +90,17 @@ import java.lang.annotation.Target;
  * the Spring TestContext Framework to merge the context configuration for the
  * {@code child} hierarchy level, simply by ensuring that the names declared via
  * {@link ContextConfiguration#name} are both {@code "child"}. The result is that
- * three application contexts will be loaded: one for {@code "/app-config.xml"},
+ * three application contexts will be loaded: one for {@code "/config-config.xml"},
  * one for {@code "/user-config.xml"}, and one for <code>{"/user-config.xml",
  * "/order-config.xml"}</code>. As with the previous example, the application
- * context loaded from {@code "/app-config.xml"} will be set as the parent context
+ * context loaded from {@code "/config-config.xml"} will be set as the parent context
  * for the contexts loaded from {@code "/user-config.xml"} and <code>{"/user-config.xml",
  * "/order-config.xml"}</code>.
  *
  * <pre class="code">
  * &#064;RunWith(SpringRunner.class)
  * &#064;ContextHierarchy({
- *     &#064;ContextConfiguration(name = "parent", locations = "/app-config.xml"),
+ *     &#064;ContextConfiguration(name = "parent", locations = "/config-config.xml"),
  *     &#064;ContextConfiguration(name = "child",  locations = "/user-config.xml")
  * })
  * public class BaseTests {}
@@ -116,12 +116,12 @@ import java.lang.annotation.Target;
  * by setting the {@link ContextConfiguration#inheritLocations} flag to {@code false}.
  * Consequently, the application context for {@code ExtendedTests} will be loaded
  * only from {@code "/test-user-config.xml"} and will have its parent set to the
- * context loaded from {@code "/app-config.xml"}.
+ * context loaded from {@code "/config-config.xml"}.
  *
  * <pre class="code">
  * &#064;RunWith(SpringRunner.class)
  * &#064;ContextHierarchy({
- *     &#064;ContextConfiguration(name = "parent", locations = "/app-config.xml"),
+ *     &#064;ContextConfiguration(name = "parent", locations = "/config-config.xml"),
  *     &#064;ContextConfiguration(name = "child",  locations = "/user-config.xml")
  * })
  * public class BaseTests {}

@@ -592,9 +592,9 @@ public class MvcNamespaceTests {
 		ModelAndView mv = adapter.handle(request, new MockHttpServletResponse(), chain.getHandler());
 		assertNull(mv.getViewName());
 
-		request = new MockHttpServletRequest("GET", "/myapp/app/bar");
+		request = new MockHttpServletRequest("GET", "/myapp/config/bar");
 		request.setContextPath("/myapp");
-		request.setServletPath("/app");
+		request.setServletPath("/config");
 		chain = mapping2.getHandler(request);
 		assertEquals(4, chain.getInterceptors().length);
 		assertTrue(chain.getInterceptors()[1] instanceof ConversionServiceExposingInterceptor);
@@ -603,9 +603,9 @@ public class MvcNamespaceTests {
 		mv = adapter.handle(request, new MockHttpServletResponse(), chain.getHandler());
 		assertEquals("baz", mv.getViewName());
 
-		request = new MockHttpServletRequest("GET", "/myapp/app/");
+		request = new MockHttpServletRequest("GET", "/myapp/config/");
 		request.setContextPath("/myapp");
-		request.setServletPath("/app");
+		request.setServletPath("/config");
 		chain = mapping2.getHandler(request);
 		assertEquals(4, chain.getInterceptors().length);
 		assertTrue(chain.getInterceptors()[1] instanceof ConversionServiceExposingInterceptor);
@@ -614,9 +614,9 @@ public class MvcNamespaceTests {
 		mv = adapter.handle(request, new MockHttpServletResponse(), chain.getHandler());
 		assertEquals("root", mv.getViewName());
 
-		request = new MockHttpServletRequest("GET", "/myapp/app/old");
+		request = new MockHttpServletRequest("GET", "/myapp/config/old");
 		request.setContextPath("/myapp");
-		request.setServletPath("/app");
+		request.setServletPath("/config");
 		request.setQueryString("a=b");
 		chain = mapping2.getHandler(request);
 		mv = adapter.handle(request, new MockHttpServletResponse(), chain.getHandler());
@@ -646,10 +646,10 @@ public class MvcNamespaceTests {
 
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		request.setMethod("GET");
-		request.setRequestURI("/myapp/app/bar");
+		request.setRequestURI("/myapp/config/bar");
 		request.setContextPath("/myapp");
-		request.setServletPath("/app/");
-		request.setAttribute("com.ibm.websphere.servlet.uri_non_decoded", "/myapp/app/bar");
+		request.setServletPath("/config/");
+		request.setAttribute("com.ibm.websphere.servlet.uri_non_decoded", "/myapp/config/bar");
 		HandlerExecutionChain chain = mapping2.getHandler(request);
 		assertEquals(4, chain.getInterceptors().length);
 		assertTrue(chain.getInterceptors()[1] instanceof ConversionServiceExposingInterceptor);
@@ -658,9 +658,9 @@ public class MvcNamespaceTests {
 		ModelAndView mv2 = adapter.handle(request, new MockHttpServletResponse(), chain.getHandler());
 		assertEquals("baz", mv2.getViewName());
 
-		request.setRequestURI("/myapp/app/");
+		request.setRequestURI("/myapp/config/");
 		request.setContextPath("/myapp");
-		request.setServletPath("/app/");
+		request.setServletPath("/config/");
 		chain = mapping2.getHandler(request);
 		assertEquals(4, chain.getInterceptors().length);
 		assertTrue(chain.getInterceptors()[1] instanceof ConversionServiceExposingInterceptor);

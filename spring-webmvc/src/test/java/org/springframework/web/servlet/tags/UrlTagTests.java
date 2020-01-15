@@ -469,18 +469,18 @@ public class UrlTagTests extends AbstractTagTests {
 
 	@Test
 	public void createUrlLocalContext() throws JspException {
-		((MockHttpServletRequest) context.getRequest()).setContextPath("/app-context");
+		((MockHttpServletRequest) context.getRequest()).setContextPath("/config-context");
 
 		tag.setValue("/url/path");
 		tag.doStartTag();
 
 		String uri = tag.createUrl();
-		assertEquals("/app-context/url/path", uri);
+		assertEquals("/config-context/url/path", uri);
 	}
 
 	@Test
 	public void createUrlRemoteContext() throws JspException {
-		((MockHttpServletRequest) context.getRequest()).setContextPath("/app-context");
+		((MockHttpServletRequest) context.getRequest()).setContextPath("/config-context");
 
 		tag.setValue("/url/path");
 		tag.setContext("some-other-context");
@@ -492,7 +492,7 @@ public class UrlTagTests extends AbstractTagTests {
 
 	@Test
 	public void createUrlRemoteContextWithSlash() throws JspException {
-		((MockHttpServletRequest) context.getRequest()).setContextPath("/app-context");
+		((MockHttpServletRequest) context.getRequest()).setContextPath("/config-context");
 
 		tag.setValue("/url/path");
 		tag.setContext("/some-other-context");
@@ -504,7 +504,7 @@ public class UrlTagTests extends AbstractTagTests {
 
 	@Test
 	public void createUrlRemoteContextSingleSlash() throws JspException {
-		((MockHttpServletRequest) context.getRequest()).setContextPath("/app-context");
+		((MockHttpServletRequest) context.getRequest()).setContextPath("/config-context");
 
 		tag.setValue("/url/path");
 		tag.setContext("/");
