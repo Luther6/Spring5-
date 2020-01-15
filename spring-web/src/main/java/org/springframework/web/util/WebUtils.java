@@ -206,12 +206,12 @@ public abstract class WebUtils {
 	public static final String RESPONSE_ENCODED_HTML_ESCAPE_CONTEXT_PARAM = "responseEncodedHtmlEscape";
 
 	/**
-	 * Web app root key parameter at the servlet context level
+	 * Web config root key parameter at the servlet context level
 	 * (i.e. a context-param in {@code web.xml}): "webAppRootKey".
 	 */
 	public static final String WEB_APP_ROOT_KEY_PARAM = "webAppRootKey";
 
-	/** Default web app root key: "webapp.root". */
+	/** Default web config root key: "webapp.root". */
 	public static final String DEFAULT_WEB_APP_ROOT_KEY = "webapp.root";
 
 	/** Name suffixes in case of image buttons. */
@@ -239,22 +239,22 @@ public abstract class WebUtils {
 		String root = servletContext.getRealPath("/");
 		if (root == null) {
 			throw new IllegalStateException(
-					"Cannot set web app root system property when WAR file is not expanded");
+					"Cannot set web config root system property when WAR file is not expanded");
 		}
 		String param = servletContext.getInitParameter(WEB_APP_ROOT_KEY_PARAM);
 		String key = (param != null ? param : DEFAULT_WEB_APP_ROOT_KEY);
 		String oldValue = System.getProperty(key);
 		if (oldValue != null && !StringUtils.pathEquals(oldValue, root)) {
-			throw new IllegalStateException("Web app root system property already set to different value: '" +
+			throw new IllegalStateException("Web config root system property already set to different value: '" +
 					key + "' = [" + oldValue + "] instead of [" + root + "] - " +
 					"Choose unique values for the 'webAppRootKey' context-param in your web.xml files!");
 		}
 		System.setProperty(key, root);
-		servletContext.log("Set web app root system property: '" + key + "' = [" + root + "]");
+		servletContext.log("Set web config root system property: '" + key + "' = [" + root + "]");
 	}
 
 	/**
-	 * Remove the system property that points to the web app root directory.
+	 * Remove the system property that points to the web config root directory.
 	 * To be called on shutdown of the web application.
 	 * @param servletContext the servlet context of the web application
 	 * @see #setWebAppRootSystemProperty

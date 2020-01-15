@@ -15,13 +15,13 @@ import org.springframework.stereotype.Component;
  * 具体使用,当我们把这个类注册到Spring容器中,如果我们通过这个Bean的名称获取对象的话,
  * 那么我们只会获取到getObject()返回的对象。这个返回的Bean何时初始化取决于实现了方法
  *
- * isSingleton()。默认为true,就是单例的ean。
+ * isSingleton()。默认为true,就是单例的bean。
  *
  * 如何获取到FactoryBean这个对象呢?只需要在获取Bean的BeanName前面加上&。
  * 当然这只是通过名称获取时,我们需要注意的规则?我们通过类型获取的时候,只要通过类型获取
  * 并不需要其余的操作。
  *
- * 那么你会想这个类有什么作用呢? 它返回的类就是一个Bean而已？为什么我们不能直接在返回的这个类上
+ * 那么你会想这个类有什么作用呢? 它返回的类就是一个Bean而已?为什么我们不能直接在返回的这个类上
  * 加上我们的@Component呢。
  *
  * 这个类的主要作用在MyBaits源码中体现的淋漓尽致。主要总结一下。之后分析MyBaits源码再来。
@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 public class FactoryTestBean implements FactoryBean {
 	@Override
 	public Object getObject() throws Exception {
+
 		return new TestBean();
 	}
 

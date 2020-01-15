@@ -48,6 +48,9 @@ final class LogAdapter {
 	private static final LogApi logApi;
 
 	static {
+		/**
+		 * isPresent()用来判断当前项目中是否存在该类:org.apache.logging.log4j.spi.ExtendedLogger
+		 */
 		if (isPresent(LOG4J_SPI)) {
 			if (isPresent(LOG4J_SLF4J_PROVIDER) && isPresent(SLF4J_SPI)) {
 				// log4j-to-slf4j bridge -> we'll rather go with the SLF4J SPI;
@@ -80,6 +83,8 @@ final class LogAdapter {
 
 
 	/**
+	 *
+	 * 先来分析static{} 语句块
 	 * Create an actual {@link Log} instance for the selected API.
 	 * @param name the logger name
 	 */

@@ -25,13 +25,13 @@ import org.springframework.beans.CachedIntrospectionResults;
 
 /**
  * Listener that flushes the JDK's {@link java.beans.Introspector JavaBeans Introspector}
- * cache on web app shutdown. Register this listener in your {@code web.xml} to
+ * cache on web config shutdown. Register this listener in your {@code web.xml} to
  * guarantee proper release of the web application class loader and its loaded classes.
  *
  * <p><b>If the JavaBeans Introspector has been used to analyze application classes,
  * the system-level Introspector cache will hold a hard reference to those classes.
  * Consequently, those classes and the web application class loader will not be
- * garbage-collected on web app shutdown!</b> This listener performs proper cleanup,
+ * garbage-collected on web config shutdown!</b> This listener performs proper cleanup,
  * to allow for garbage collection to take effect.
  *
  * <p>Unfortunately, the only way to clean up the Introspector is to flush
@@ -55,9 +55,9 @@ import org.springframework.beans.CachedIntrospectionResults;
  * e.g. Struts and Quartz.
  *
  * <p>Note that a single such Introspector leak will cause the entire web
- * app class loader to not get garbage collected! This has the consequence that
+ * config class loader to not get garbage collected! This has the consequence that
  * you will see all the application's static class resources (like singletons)
- * around after web app shutdown, which is not the fault of those classes!
+ * around after web config shutdown, which is not the fault of those classes!
  *
  * <p><b>This listener should be registered as the first one in {@code web.xml},
  * before any application listeners such as Spring's ContextLoaderListener.</b>

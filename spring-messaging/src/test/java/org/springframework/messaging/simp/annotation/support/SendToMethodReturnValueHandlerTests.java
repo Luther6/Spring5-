@@ -148,7 +148,7 @@ public class SendToMethodReturnValueHandlerTests {
 		given(this.messageChannel.send(any(Message.class))).willReturn(true);
 
 		String sessionId = "sess1";
-		Message<?> inputMessage = createMessage(sessionId, "sub1", "/app", "/dest", null);
+		Message<?> inputMessage = createMessage(sessionId, "sub1", "/config", "/dest", null);
 		this.handler.handleReturnValue(PAYLOAD, this.noAnnotationsReturnType, inputMessage);
 
 		verify(this.messageChannel, times(1)).send(this.messageCaptor.capture());
@@ -173,7 +173,7 @@ public class SendToMethodReturnValueHandlerTests {
 		given(this.messageChannel.send(any(Message.class))).willReturn(true);
 
 		String sessionId = "sess1";
-		Message<?> inputMessage = createMessage(sessionId, "sub1", "/app", "/dest", null);
+		Message<?> inputMessage = createMessage(sessionId, "sub1", "/config", "/dest", null);
 		this.handler.handleReturnValue(PAYLOAD, this.sendToDefaultDestReturnType, inputMessage);
 
 		verify(this.messageChannel, times(1)).send(this.messageCaptor.capture());
@@ -303,7 +303,7 @@ public class SendToMethodReturnValueHandlerTests {
 	public void sendToDefaultDestinationWhenUsingDotPathSeparator() throws Exception {
 		given(this.messageChannel.send(any(Message.class))).willReturn(true);
 
-		Message<?> inputMessage = createMessage("sess1", "sub1", "/app/", "dest.foo.bar", null);
+		Message<?> inputMessage = createMessage("sess1", "sub1", "/config/", "dest.foo.bar", null);
 		this.handler.handleReturnValue(PAYLOAD, this.sendToDefaultDestReturnType, inputMessage);
 
 		verify(this.messageChannel, times(1)).send(this.messageCaptor.capture());
@@ -314,7 +314,7 @@ public class SendToMethodReturnValueHandlerTests {
 
 	@Test
 	public void testHeadersToSend() throws Exception {
-		Message<?> message = createMessage("sess1", "sub1", "/app", "/dest", null);
+		Message<?> message = createMessage("sess1", "sub1", "/config", "/dest", null);
 
 		SimpMessageSendingOperations messagingTemplate = Mockito.mock(SimpMessageSendingOperations.class);
 		SendToMethodReturnValueHandler handler = new SendToMethodReturnValueHandler(messagingTemplate, false);
@@ -463,7 +463,7 @@ public class SendToMethodReturnValueHandlerTests {
 
 		String sessionId = "sess1";
 		TestUser user = new TestUser();
-		Message<?> inputMessage = createMessage(sessionId, "sub1", "/app", "/dest", user);
+		Message<?> inputMessage = createMessage(sessionId, "sub1", "/config", "/dest", user);
 		this.handler.handleReturnValue(PAYLOAD, this.sendToUserDefaultDestReturnType, inputMessage);
 
 		verify(this.messageChannel, times(1)).send(this.messageCaptor.capture());
@@ -479,7 +479,7 @@ public class SendToMethodReturnValueHandlerTests {
 		given(this.messageChannel.send(any(Message.class))).willReturn(true);
 
 		TestUser user = new TestUser();
-		Message<?> inputMessage = createMessage("sess1", "sub1", "/app/", "dest.foo.bar", user);
+		Message<?> inputMessage = createMessage("sess1", "sub1", "/config/", "dest.foo.bar", user);
 		this.handler.handleReturnValue(PAYLOAD, this.sendToUserDefaultDestReturnType, inputMessage);
 
 		verify(this.messageChannel, times(1)).send(this.messageCaptor.capture());
@@ -494,7 +494,7 @@ public class SendToMethodReturnValueHandlerTests {
 
 		String sessionId = "sess1";
 		TestUser user = new TestUser();
-		Message<?> message = createMessage(sessionId, "sub1", "/app", "/dest", user);
+		Message<?> message = createMessage(sessionId, "sub1", "/config", "/dest", user);
 		this.handler.handleReturnValue(PAYLOAD, this.sendToUserInSessionDefaultDestReturnType, message);
 
 		verify(this.messageChannel, times(1)).send(this.messageCaptor.capture());
@@ -532,7 +532,7 @@ public class SendToMethodReturnValueHandlerTests {
 		given(this.messageChannel.send(any(Message.class))).willReturn(true);
 
 		String sessionId = "sess1";
-		Message<?> inputMessage = createMessage(sessionId, "sub1", "/app", "/dest", null);
+		Message<?> inputMessage = createMessage(sessionId, "sub1", "/config", "/dest", null);
 		this.jsonHandler.handleReturnValue(handleAndSendToJsonView(), this.jsonViewReturnType, inputMessage);
 
 		verify(this.messageChannel).send(this.messageCaptor.capture());

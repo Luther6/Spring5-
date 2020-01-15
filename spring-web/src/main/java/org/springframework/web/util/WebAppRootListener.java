@@ -34,13 +34,13 @@ import javax.servlet.ServletContextListener;
  * implicitly, so there's no need for this listener in addition to it.
  *
  * <p><b>WARNING</b>: Some containers, e.g. Tomcat, do NOT keep system properties separate
- * per web app. You have to use unique "webAppRootKey" context-params per web app
- * then, to avoid clashes. Other containers like Resin do isolate each web app's
+ * per web config. You have to use unique "webAppRootKey" context-params per web config
+ * then, to avoid clashes. Other containers like Resin do isolate each web config's
  * system properties: Here you can use the default key (i.e. no "webAppRootKey"
  * context-param at all) without worrying.
  *
  * <p><b>WARNING</b>: The WAR file containing the web application needs to be expanded
- * to allow for setting the web app root system property. This is by default not
+ * to allow for setting the web config root system property. This is by default not
  * the case when a WAR file gets deployed to WebLogic, for example. Do not use
  * this listener in such an environment!
  *

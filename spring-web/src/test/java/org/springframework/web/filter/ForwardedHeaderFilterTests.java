@@ -121,20 +121,20 @@ public class ForwardedHeaderFilterTests {
 
 	@Test
 	public void contextPathPreserveEncoding() throws Exception {
-		this.request.setContextPath("/app%20");
-		this.request.setRequestURI("/app%20/path/");
+		this.request.setContextPath("/config%20");
+		this.request.setRequestURI("/config%20/path/");
 		HttpServletRequest actual = filterAndGetWrappedRequest();
 
-		assertEquals("/app%20", actual.getContextPath());
-		assertEquals("/app%20/path/", actual.getRequestURI());
-		assertEquals("http://localhost/app%20/path/", actual.getRequestURL().toString());
+		assertEquals("/config%20", actual.getContextPath());
+		assertEquals("/config%20/path/", actual.getRequestURI());
+		assertEquals("http://localhost/config%20/path/", actual.getRequestURL().toString());
 	}
 
 	@Test
 	public void requestUri() throws Exception {
 		this.request.addHeader(X_FORWARDED_PREFIX, "/");
-		this.request.setContextPath("/app");
-		this.request.setRequestURI("/app/path");
+		this.request.setContextPath("/config");
+		this.request.setRequestURI("/config/path");
 		HttpServletRequest actual = filterAndGetWrappedRequest();
 
 		assertEquals("", actual.getContextPath());
@@ -144,8 +144,8 @@ public class ForwardedHeaderFilterTests {
 	@Test
 	public void requestUriWithTrailingSlash() throws Exception {
 		this.request.addHeader(X_FORWARDED_PREFIX, "/");
-		this.request.setContextPath("/app");
-		this.request.setRequestURI("/app/path/");
+		this.request.setContextPath("/config");
+		this.request.setRequestURI("/config/path/");
 		HttpServletRequest actual = filterAndGetWrappedRequest();
 
 		assertEquals("", actual.getContextPath());
@@ -154,20 +154,20 @@ public class ForwardedHeaderFilterTests {
 
 	@Test
 	public void requestUriPreserveEncoding() throws Exception {
-		this.request.setContextPath("/app");
-		this.request.setRequestURI("/app/path%20with%20spaces/");
+		this.request.setContextPath("/config");
+		this.request.setRequestURI("/config/path%20with%20spaces/");
 		HttpServletRequest actual = filterAndGetWrappedRequest();
 
-		assertEquals("/app", actual.getContextPath());
-		assertEquals("/app/path%20with%20spaces/", actual.getRequestURI());
-		assertEquals("http://localhost/app/path%20with%20spaces/", actual.getRequestURL().toString());
+		assertEquals("/config", actual.getContextPath());
+		assertEquals("/config/path%20with%20spaces/", actual.getRequestURI());
+		assertEquals("http://localhost/config/path%20with%20spaces/", actual.getRequestURL().toString());
 	}
 
 	@Test
 	public void requestUriEqualsContextPath() throws Exception {
 		this.request.addHeader(X_FORWARDED_PREFIX, "/");
-		this.request.setContextPath("/app");
-		this.request.setRequestURI("/app");
+		this.request.setContextPath("/config");
+		this.request.setRequestURI("/config");
 		HttpServletRequest actual = filterAndGetWrappedRequest();
 
 		assertEquals("", actual.getContextPath());
@@ -177,8 +177,8 @@ public class ForwardedHeaderFilterTests {
 	@Test
 	public void requestUriRootUrl() throws Exception {
 		this.request.addHeader(X_FORWARDED_PREFIX, "/");
-		this.request.setContextPath("/app");
-		this.request.setRequestURI("/app/");
+		this.request.setContextPath("/config");
+		this.request.setRequestURI("/config/");
 		HttpServletRequest actual = filterAndGetWrappedRequest();
 
 		assertEquals("", actual.getContextPath());

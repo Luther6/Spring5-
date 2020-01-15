@@ -211,7 +211,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 	/**
 	 * Request attribute to hold the current web application context.
-	 * Otherwise only the global web app context is obtainable by tags etc.
+	 * Otherwise only the global web config context is obtainable by tags etc.
 	 * @see org.springframework.web.servlet.support.RequestContextUtils#findWebApplicationContext
 	 */
 	public static final String WEB_APPLICATION_CONTEXT_ATTRIBUTE = DispatcherServlet.class.getName() + ".CONTEXT";
@@ -285,6 +285,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		// This is currently strictly internal and not meant to be customized
 		// by application developers.
 		try {
+			//加载默认的Web配置 比如:视图解析,异常处理等类
 			ClassPathResource resource = new ClassPathResource(DEFAULT_STRATEGIES_PATH, DispatcherServlet.class);
 			defaultStrategies = PropertiesLoaderUtils.loadProperties(resource);
 		}
@@ -492,6 +493,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	@Override
 	protected void onRefresh(ApplicationContext context) {
+		//这个方法特别重要的了
 		initStrategies(context);
 	}
 
@@ -500,13 +502,21 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * <p>May be overridden in subclasses in order to initialize further strategy objects.
 	 */
 	protected void initStrategies(ApplicationContext context) {
+		//如果有上传组件的话,那么这里将会进行初始化
 		initMultipartResolver(context);
+		//初始化本地语言环境,在国际化中可能会使用
 		initLocaleResolver(context);
+		//初始化主题,没怎么用过
 		initThemeResolver(context);
+		//初始化映射处理器(这里就特别重要了)
 		initHandlerMappings(context);
+		//初始化请求处理适配器
 		initHandlerAdapters(context);
+		//初始化异常解析器
 		initHandlerExceptionResolvers(context);
+		//初始化请求解析器
 		initRequestToViewNameTranslator(context);
+		//初始化视图解析器
 		initViewResolvers(context);
 		initFlashMapManager(context);
 	}
@@ -518,6 +528,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	private void initMultipartResolver(ApplicationContext context) {
 		try {
+			//在这里我们可以了解到Spring值希望只有一个上传下载的处理器。所以在注册Multipart时beanName必须为multipartResolver
 			this.multipartResolver = context.getBean(MULTIPART_RESOLVER_BEAN_NAME, MultipartResolver.class);
 			if (logger.isTraceEnabled()) {
 				logger.trace("Detected " + this.multipartResolver);
@@ -594,12 +605,13 @@ public class DispatcherServlet extends FrameworkServlet {
 		this.handlerMappings = null;
 
 		if (this.detectAllHandlerMappings) {
-			// Find all HandlerMappings in the ApplicationContext, including ancestor contexts.
+			// Find all HandlerMappings in the ApplicationContext, including ancestor contexts.每一个HandlerMapping都应该有一个afterProperties()
 			Map<String, HandlerMapping> matchingBeans =
 					BeanFactoryUtils.beansOfTypeIncludingAncestors(context, HandlerMapping.class, true, false);
+
 			if (!matchingBeans.isEmpty()) {
 				this.handlerMappings = new ArrayList<>(matchingBeans.values());
-				// We keep HandlerMappings in sorted order.
+				// We keep HandlerMappings in sorted order.根据getOrder()来进行排序
 				AnnotationAwareOrderComparator.sort(this.handlerMappings);
 			}
 		}
@@ -633,7 +645,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		this.handlerAdapters = null;
 
 		if (this.detectAllHandlerAdapters) {
-			// Find all HandlerAdapters in the ApplicationContext, including ancestor contexts.
+			// Find all HandlerAdapters in the ApplicationContext, including ancestor contexts.adapter在解析springMvc.xml时进行注册了三个adapter
 			Map<String, HandlerAdapter> matchingBeans =
 					BeanFactoryUtils.beansOfTypeIncludingAncestors(context, HandlerAdapter.class, true, false);
 			if (!matchingBeans.isEmpty()) {
@@ -924,7 +936,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
-		// Make framework objects available to handlers and view objects.
+		// Make framework objects available to handlers and view objects.  设置资源主题与SpringWeb上下文与本地语言解析器等
 		request.setAttribute(WEB_APPLICATION_CONTEXT_ATTRIBUTE, getWebApplicationContext());
 		request.setAttribute(LOCALE_RESOLVER_ATTRIBUTE, this.localeResolver);
 		request.setAttribute(THEME_RESOLVER_ATTRIBUTE, this.themeResolver);
@@ -1008,7 +1020,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			ModelAndView mv = null;
 			Exception dispatchException = null;
 
-			try {
+			try {//判断请求是否有文件上传操作
 				processedRequest = checkMultipart(request);
 				multipartRequestParsed = (processedRequest != request);
 
@@ -1019,7 +1031,7 @@ public class DispatcherServlet extends FrameworkServlet {
 					return;
 				}
 
-				// Determine handler adapter for the current request.
+				// Determine handler adapter for the current request.获取请求适配器
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
 				// Process last-modified header, if supported by the handler.

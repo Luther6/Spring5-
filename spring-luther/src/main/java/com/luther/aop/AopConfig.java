@@ -9,7 +9,7 @@ import org.springframework.context.annotation.*;
 @Configuration
 @EnableAspectJAutoProxy(exposeProxy = true) //开启Spring AOP代理。其主要的作用就是为我们的Spring上下文中注入一个后置处理器。分析一下把。
 						//proxyTargetClass 用来开启默认使用什么代理 默认为false:JDK,true:CGLib
-@ComponentScan("com.luther.aop")
+@ComponentScan(value = {"com.luther.aop","com.luther.web"})
 public class AopConfig {
 /*	@Bean
 	public AopTestBean aopTestBean(){

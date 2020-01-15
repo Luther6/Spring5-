@@ -110,7 +110,7 @@ import org.springframework.stereotype.Component;
  *
  * <pre class="code">
  * &#064;Configuration
- * &#064;ComponentScan("com.acme.app.services")
+ * &#064;ComponentScan("com.acme.config.services")
  * public class AppConfig {
  *     // various &#064;Bean definitions ...
  * }</pre>
@@ -146,7 +146,7 @@ import org.springframework.stereotype.Component;
  *
  * <pre class="code">
  * &#064;Configuration
- * &#064;PropertySource("classpath:/com/acme/app.properties")
+ * &#064;PropertySource("classpath:/com/acme/config.properties")
  * public class AppConfig {
  *
  *     &#064Inject Environment env;
@@ -167,7 +167,7 @@ import org.springframework.stereotype.Component;
  *
  * <pre class="code">
  * &#064;Configuration
- * &#064;PropertySource("classpath:/com/acme/app.properties")
+ * &#064;PropertySource("classpath:/com/acme/config.properties")
  * public class AppConfig {
  *
  *     &#064Value("${bean.name}") String beanName;

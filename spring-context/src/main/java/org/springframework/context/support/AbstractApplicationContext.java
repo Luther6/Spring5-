@@ -523,7 +523,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 			// Tell the subclass to refresh the internal bean factory.
 			/**
-			 * 返回我们的BeanFactory,主要是为了刷新(初始化)我们的BeanFactory
+			 * 返回我们的BeanFactory,主要是为了刷新(初始化)我们的BeanFactory。
+			 * 在XML解析中这里便开始解析我们的bd了
 			 */
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
@@ -580,7 +581,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.完成当前上下文的初始化。一些缓存清除的操作。并把当前上下文加入到上下文容器中
-				// 有多个上下文在Web中  oh My God。
+				// 发布相关Event
 				finishRefresh();
 			}
 
@@ -628,7 +629,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Initialize any placeholder property sources in the context environment.
-		//该方法并没有任何作用,Spring可能再之后的版本使用把
+		//该方法并没有任何作用,在Spring WebApplicationContext中用来初始化资源配置
 		initPropertySources();
 
 		// Validate that all properties marked as required are resolvable:
@@ -667,7 +668,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
 		/**
-		 * 主要是用来设置当前Bean的序列化ID
+		 * 在普通的XML配置中,在这里将会对配置的IOC容器相关的xml文件进行解析,
+		 * 并扫描注册bd到bd map中
 		 */
 		refreshBeanFactory();
 		/**
@@ -709,7 +711,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.registerResolvableDependency(ApplicationContext.class, this);
 
 		// Register early post-processor for detecting inner beans as ApplicationListeners.
-		//用于检测Spring内部bean的后置处理器
+		//设置一个后置处理器用来对Spring中的监听器进行处理
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found.
@@ -881,7 +883,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	protected void registerListeners() {
 		// Register statically specified listeners first.
 		for (ApplicationListener<?> listener : getApplicationListeners()) {
-			getApplicationEventMulticaster().addApplicationListener(listener);
+			getApplicationEventMulticaster().addApplicationListener(listener);//缓存到AbstractApplicationEventMulticaster的defaultRetriever中
 		}
 
 		// Do not initialize FactoryBeans here: We need to leave all regular beans
@@ -896,7 +898,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		this.earlyApplicationEvents = null;
 		if (earlyEventsToProcess != null) {
 			for (ApplicationEvent earlyEvent : earlyEventsToProcess) {
-				getApplicationEventMulticaster().multicastEvent(earlyEvent);
+				getApplicationEventMulticaster().multicastEvent(earlyEvent);//查询当前是否有需要进行运行的Event
 			}
 		}
 	}

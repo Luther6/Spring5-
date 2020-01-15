@@ -56,6 +56,7 @@ public abstract class LogFactory {
 	 * @param clazz containing Class from which a log name will be derived
 	 */
 	public static Log getLog(Class<?> clazz) {
+		//返回日志对象
 		return getLog(clazz.getName());
 	}
 
@@ -64,6 +65,7 @@ public abstract class LogFactory {
 	 * @param name logical name of the <code>Log</code> instance to be returned
 	 */
 	public static Log getLog(String name) {
+		//Spring在内部来创建具体的log对象
 		return LogAdapter.createLog(name);
 	}
 

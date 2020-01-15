@@ -1920,6 +1920,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		/**
 		 * 用来处理postProcessAfterInitialization方法比较少
 		 * 在这一步最重要的一个BeanPostProcessor就是我们用来处理AOP的AnnotationAwareAspectJAutoProxyCreator.class
+		 * 在这里也将会对我们的特殊bean 如:Listener进行发现注册。后置处理器为ApplicationListenerDetector
 		 */
 		if (mbd == null || !mbd.isSynthetic()) {
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);

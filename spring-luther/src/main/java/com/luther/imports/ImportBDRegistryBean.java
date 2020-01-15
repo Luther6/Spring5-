@@ -30,6 +30,10 @@ public class ImportBDRegistryBean implements ImportBeanDefinitionRegistrar,BeanC
 //		importDao.show("name");
 	}
 
+	/**
+	 * 好像是这样的
+	 * @param classLoader the owning class loader
+	 */
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		System.out.println("??");

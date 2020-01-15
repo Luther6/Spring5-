@@ -64,6 +64,7 @@ public final class MethodIntrospector {
 			specificHandlerType = ClassUtils.getUserClass(targetType);
 			handlerTypes.add(specificHandlerType);
 		}
+		//得到当前类所实现的所有接口
 		handlerTypes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetType));
 
 		for (Class<?> currentHandlerType : handlerTypes) {
@@ -71,8 +72,10 @@ public final class MethodIntrospector {
 
 			ReflectionUtils.doWithMethods(currentHandlerType, method -> {
 				Method specificMethod = ClassUtils.getMostSpecificMethod(method, targetClass);
+				//解析方法的关联数据,这里用来解析处理程序的路径与类型等信息
 				T result = metadataLookup.inspect(specificMethod);
 				if (result != null) {
+					//找到当前方法的桥接方法，如果是桥接方法的话,那么将会去解析判断(不太懂)
 					Method bridgedMethod = BridgeMethodResolver.findBridgedMethod(specificMethod);
 					if (bridgedMethod == specificMethod || metadataLookup.inspect(bridgedMethod) == null) {
 						methodMap.put(specificMethod, result);

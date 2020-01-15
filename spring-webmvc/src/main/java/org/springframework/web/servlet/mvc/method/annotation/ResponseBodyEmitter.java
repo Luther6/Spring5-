@@ -155,7 +155,7 @@ public class ResponseBodyEmitter {
 
 	/**
 	 * Write the given object to the response.
-	 * <p>If any exception occurs a dispatch is made back to the app server where
+	 * <p>If any exception occurs a dispatch is made back to the config server where
 	 * Spring MVC will pass the exception through its exception handling mechanism.
 	 * <p><strong>Note:</strong> if the send fails with an IOException, you do
 	 * not need to call {@link #completeWithError(Throwable)} in order to clean
@@ -223,7 +223,7 @@ public class ResponseBodyEmitter {
 
 	/**
 	 * Complete request processing with an error.
-	 * <p>A dispatch is made into the app server where Spring MVC will pass the
+	 * <p>A dispatch is made into the config server where Spring MVC will pass the
 	 * exception through its exception handling mechanism. Note however that
 	 * at this stage of request processing, the response is committed and the
 	 * response status can no longer be changed.

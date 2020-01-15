@@ -109,6 +109,11 @@ import org.springframework.util.ReflectionUtils;
  * @see #onStartup(Set, ServletContext)
  * @see WebApplicationInitializer
  */
+
+/**
+ * 这里是Servlet3.0的技术,Servlet容器会调用在META-INF/service下的javax.servlet.ServletContainerInitializer的文件中声明的类
+ * 然后会利用@HandllesTypes()这个标签声明的接口的Class对象来找到当前Classes下所有的实现类的Class对象,并存放到set集合中
+ */
 @HandlesTypes(WebApplicationInitializer.class)
 public class SpringServletContainerInitializer implements ServletContainerInitializer {
 
@@ -141,7 +146,6 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
 	@Override
 	public void onStartup(@Nullable Set<Class<?>> webAppInitializerClasses, ServletContext servletContext)
 			throws ServletException {
-
 		List<WebApplicationInitializer> initializers = new LinkedList<>();
 
 		if (webAppInitializerClasses != null) {
@@ -168,6 +172,9 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
 
 		servletContext.log(initializers.size() + " Spring WebApplicationInitializers detected on classpath");
 		AnnotationAwareOrderComparator.sort(initializers);
+		/**
+		 * 在这里Spring会调用所有实现了WebApplicationInitializer.class的类的onStartUp()方法
+		 */
 		for (WebApplicationInitializer initializer : initializers) {
 			initializer.onStartup(servletContext);
 		}

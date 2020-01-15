@@ -30,7 +30,7 @@ public class DefaultRequestPathTests {
 	@Test
 	public void requestPath() throws Exception {
 		// basic
-		testRequestPath("/app/a/b/c", "/app", "/a/b/c");
+		testRequestPath("/config/a/b/c", "/config", "/a/b/c");
 
 		// no context path
 		testRequestPath("/a/b/c", "", "/a/b/c");
@@ -46,8 +46,8 @@ public class DefaultRequestPathTests {
 		testRequestPath("", "/", "");
 
 		// trailing slash
-		testRequestPath("/app/a/", "/app", "/a/");
-		testRequestPath("/app/a//", "/app", "/a//");
+		testRequestPath("/config/a/", "/config", "/a/");
+		testRequestPath("/config/a//", "/config", "/a//");
 	}
 
 	private void testRequestPath(String fullPath, String contextPath, String pathWithinApplication) {

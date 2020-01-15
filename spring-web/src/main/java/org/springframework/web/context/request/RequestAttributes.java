@@ -111,7 +111,7 @@ public interface RequestAttributes {
 	 * removed object will be reused or manually destroyed.
 	 * <p><b>NOTE:</b> Callback objects should generally be serializable if
 	 * they are being registered for a session scope. Otherwise the callback
-	 * (or even the entire session) might not survive web app restarts.
+	 * (or even the entire session) might not survive web config restarts.
 	 * @param name the name of the attribute to register the callback for
 	 * @param callback the destruction callback to be executed
 	 * @param scope the scope identifier

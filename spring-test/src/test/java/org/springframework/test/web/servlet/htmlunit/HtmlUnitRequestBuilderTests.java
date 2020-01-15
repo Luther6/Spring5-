@@ -510,7 +510,7 @@ public class HtmlUnitRequestBuilderTests {
 
 	@Test
 	public void buildRequestAndAntPathRequestMatcher() throws Exception {
-		webRequest.setUrl(new URL("https://example.com/app/login/authenticate"));
+		webRequest.setUrl(new URL("https://example.com/config/login/authenticate"));
 
 		MockHttpServletRequest actualRequest = requestBuilder.buildRequest(servletContext);
 

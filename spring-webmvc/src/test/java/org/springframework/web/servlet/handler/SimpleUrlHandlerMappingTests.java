@@ -125,7 +125,7 @@ public class SimpleUrlHandlerMappingTests {
 		assertTrue("Handler is correct bean", hec != null && hec.getHandler() == bean);
 
 		req = new MockHttpServletRequest("GET", "/welcome.html");
-		req.setContextPath("/app");
+		req.setContextPath("/config");
 		hec = getHandler(hm, req);
 		assertTrue("Handler is correct bean", hec != null && hec.getHandler() == bean);
 

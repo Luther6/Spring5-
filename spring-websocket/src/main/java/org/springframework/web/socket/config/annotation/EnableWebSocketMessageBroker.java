@@ -52,7 +52,7 @@ import org.springframework.context.annotation.Import;
  *     &#064;Override
  *     public void configureMessageBroker(MessageBrokerRegistry registry) {
  *         registry.enableStompBrokerRelay("/queue/", "/topic/");
- *         registry.setApplicationDestinationPrefixes("/app/");
+ *         registry.setApplicationDestinationPrefixes("/config/");
  *     }
  * }
  * </pre>

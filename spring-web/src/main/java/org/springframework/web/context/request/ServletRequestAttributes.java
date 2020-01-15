@@ -312,7 +312,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 	/**
 	 * Register the given callback as to be executed after session termination.
 	 * <p>Note: The callback object should be serializable in order to survive
-	 * web app restarts.
+	 * web config restarts.
 	 * @param name the name of the attribute to register the callback for
 	 * @param callback the callback to be executed for destruction
 	 */

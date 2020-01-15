@@ -209,9 +209,11 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	protected void initHandlerMethods() {
 		for (String beanName : getCandidateBeanNames()) {
 			if (!beanName.startsWith(SCOPED_TARGET_NAME_PREFIX)) {
+				//扫描Spring中所有的bean以查找出当前的HandlerMapping对应的处理程序
 				processCandidateBean(beanName);
 			}
 		}
+		//打印debug信息
 		handlerMethodsInitialized(getHandlerMethods());
 	}
 
@@ -238,6 +240,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @see #isHandler
 	 * @see #detectHandlerMethods
 	 */
+	@SuppressWarnings("all")
 	protected void processCandidateBean(String beanName) {
 		Class<?> beanType = null;
 		try {
@@ -249,7 +252,9 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				logger.trace("Could not resolve type for bean '" + beanName + "'", ex);
 			}
 		}
+		//isHandler()判断是否被@Controller或者@RequesMapping标注
 		if (beanType != null && isHandler(beanType)) {
+			//处理加了@Controller或者@RequestMapping的注解的Bean
 			detectHandlerMethods(beanName);
 		}
 	}
@@ -260,14 +265,18 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @see #getMappingForMethod
 	 */
 	protected void detectHandlerMethods(Object handler) {
+		//根据BeanName获取到Class对象
 		Class<?> handlerType = (handler instanceof String ?
 				obtainApplicationContext().getType((String) handler) : handler.getClass());
 
 		if (handlerType != null) {
+			//涉及到CGLIb代理的原始类的问题。先不考虑
 			Class<?> userType = ClassUtils.getUserClass(handlerType);
+			//对当前类的所有方法进行解析,解析映射关系
 			Map<Method, T> methods = MethodIntrospector.selectMethods(userType,
 					(MethodIntrospector.MetadataLookup<T>) method -> {
 						try {
+							//得到当前方法的映射关系
 							return getMappingForMethod(method, userType);
 						}
 						catch (Throwable ex) {
@@ -279,7 +288,9 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				logger.trace(formatMappings(userType, methods));
 			}
 			methods.forEach((method, mapping) -> {
+				//得到当前类可调用的方法
 				Method invocableMethod = AopUtils.selectInvocableMethod(method, userType);
+				// 将解析得到的映射关系与方法对象和方法所在的类对象的BeanName缓存到mappingRegistry中
 				registerHandlerMethod(handler, invocableMethod, mapping);
 			});
 		}
@@ -522,7 +533,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 */
 	class MappingRegistry {
 
-		private final Map<T, MappingRegistration<T>> registry = new HashMap<>();
+			private final Map<T, MappingRegistration<T>> registry = new HashMap<>();
 
 		private final Map<T, HandlerMethod> mappingLookup = new LinkedHashMap<>();
 

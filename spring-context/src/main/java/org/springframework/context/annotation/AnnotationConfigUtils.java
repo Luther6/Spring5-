@@ -153,7 +153,7 @@ public abstract class AnnotationConfigUtils {
 	 */
 	public static Set<BeanDefinitionHolder> registerAnnotationConfigProcessors(
 			BeanDefinitionRegistry registry, @Nullable Object source) {
-		// 这里是其实就是我们的之前BeanFactory
+		// 这里是其实就是我们的之前实例化的BeanFactory
 		DefaultListableBeanFactory beanFactory = unwrapDefaultListableBeanFactory(registry);
 		if (beanFactory != null) {
 			if (!(beanFactory.getDependencyComparator() instanceof AnnotationAwareOrderComparator)) {
@@ -161,7 +161,7 @@ public abstract class AnnotationConfigUtils {
 				beanFactory.setDependencyComparator(AnnotationAwareOrderComparator.INSTANCE);
 			}
 			if (!(beanFactory.getAutowireCandidateResolver() instanceof ContextAnnotationAutowireCandidateResolver)) {
-				//在BeanFactory中添加ContextAnnotationAutowireCandidateResolver,用来支持Spring的懒加载
+				//在BeanFactory中添加ContextAnnotationAutowireCandidateResolver,用来支持Spring的懒加载等
 				beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
 			}
 		}

@@ -13,17 +13,16 @@ import com.luther.dao.UserDao1;
 import com.luther.imports.ImportDao;
 import com.luther.imports.ImportTestBean;
 import com.luther.property.SpringProperty;
+import com.luther.web.CusController;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.cglib.core.DebuggingClassWriter;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
 
 /**
  * @author liujie
@@ -36,10 +35,7 @@ public class Test {
 /*		AopConfig bean = annotationConfigApplicationContext.getBean(AopConfig.class);
 		bean.aopTestBean();*/
 
-		Aop aopTestBean = (Aop) annotationConfigApplicationContext.getBean("aopTestBean");
-		Aop aopTestBean2 = (Aop) annotationConfigApplicationContext.getBean("aopTestBean2");
-		aopTestBean.show();
-
+		CusController bean = annotationConfigApplicationContext.getBean(CusController.class);
 
 	}
 }

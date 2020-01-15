@@ -117,8 +117,8 @@ public abstract class AopUtils {
 
 	/**
 	 * Select an invocable method on the target type: either the given method itself
-	 * if actually exposed on the target type, or otherwise a corresponding method
-	 * on one of the target type's interfaces or on the target type itself.
+	 * 	 * if actually exposed on the target type, or otherwise a corresponding method
+	 * 	 * on one of the target type's interfaces or on the target type itself.
 	 * @param method the method to check
 	 * @param targetType the target type to search methods on (typically an AOP proxy)
 	 * @return a corresponding invocable method on the target type

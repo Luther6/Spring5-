@@ -1,0 +1,45 @@
+<!DOCTYPE web-app PUBLIC
+		"-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+		"http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+
+	<!--这里是SpringMvc XML的最基本的配置了,在这里主要是为了探究一下原来的SpringMvc是如何创建SpringWeb 容器的。
+	所以这里并不会去过多的介绍Spring 是如何通过XML来解析注册Spring IOC容器的。
+	在这之前,有两点需要注意
+	1、Tomcat在启动时,会对Web.xml进行扫描,然后我们在这里配置了一个ContextLoaderListener来监听并创建Spring
+		的IOC容器。Tomcat在加载到该监听器时，会调用无参构造函数进行初始化.然后会调用该类的contextInitialized()。
+	2、Tomcat在启动时,同样也是会对DispatcherServlet,这里简单的解释一下<load-on-startup>的作用:
+		让Tomcat在加载该Servlet时,就对其进行初始化。其余的就是配置一些映射。(这些时Tomcat的源码,之后分析Tomcat源码！)
+
+		contextInitialized()；第一步入口
+	-->
+	<display-name>Archetype Created Web Application</display-name>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:application.xml</param-value>
+
+	</context-param>
+
+
+	<listener>
+
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+
+	</listener>
+
+	<!--配置SpringMVC前端-->
+	<servlet>
+		<servlet-name>hello</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:springmvc.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>hello</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+</web-app>
